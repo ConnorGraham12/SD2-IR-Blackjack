@@ -4,6 +4,7 @@ from tkinter import font
 from tkinter.constants import ANCHOR, S
 from tkinter.font import Font, nametofont
 from PIL import ImageTk, Image
+from cv2 import THRESH_TOZERO
 
 #Import external functions
 from test3 import startWebcam
@@ -93,16 +94,76 @@ startstream = ttk.Button(tab3, text="Start Livefeed", command=startWebcam).place
 #						     #
 ##############################
 
+def simTest():
+    print('This button starts the simulator')
+
+#Logic to add instuctional text to entry fields 
+
+#Entry 1
+def on_entry_click1(event):
+    if entry1.get() == 'Enter starting bankroll...':
+       entry1.delete(0, "end") # delete all the text in the entry1
+       entry1.insert(0, '') #Insert blank for user input
+       entry1.config(fg = 'black')
+def on_focusout1(event):
+    if entry1.get() == '':
+        entry1.insert(0, 'Enter starting bankroll...')
+        entry1.config(fg = 'grey')
+
+#Entry 2
+def on_entry_click2(event):
+    if entry2.get() == 'Enter hands per hour...':
+       entry2.delete(0, "end") # delete all the text in the entry2
+       entry2.insert(0, '') #Insert blank for user input
+       entry2.config(fg = 'black')
+       
+def on_focusout2(event):
+    if entry2.get() == '':
+        entry2.insert(0, 'Enter hands per hour...')
+        entry2.config(fg = 'grey')
+
+#Entry 3
+def on_entry_click3(event):
+    if entry3.get() == 'Enter hours played...':
+       entry3.delete(0, "end") # delete all the text in the entry3
+       entry3.insert(0, '') #Insert blank for user input
+       entry3.config(fg = 'black')
+       
+def on_focusout3(event):
+    if entry3.get() == '':
+        entry3.insert(0, 'Enter hours played...')
+        entry3.config(fg = 'grey')
+
+
 ttk.Label(tab4,text ="                             Welcome to the Blackjack Counting Simulator! \n This tab will show you longterm results of your bankroll from counting cards \n in Blackjack. If you follow our hi-lo counting method perfectly, you will see \n                                        similar results overtime.").place(x=170,y=20)
 input_start_br = StringVar()
 input_hand_per_hr = StringVar()
 input_hrs_played = StringVar()
 
-entry1 = ttk.Entry(tab4, textvariable=input_start_br).place(x=100, y = 140)
-entry2 = ttk.Entry(tab4, textvariable=input_start_br).place(x=350, y = 140)
-entry3 = ttk.Entry(tab4, textvariable=input_start_br).place(x=600, y = 140)
+entry1 = tk.Entry(tab4, textvariable=input_start_br, takefocus=0)
+entry1.place(x=100, y = 140)
+entry1.config(fg = 'grey')
+entry1.insert(0,'Enter starting bankroll...')
+entry1.bind('<FocusIn>', on_entry_click1) 
+entry1.bind('<FocusOut>', on_focusout1)
 
-ttk.Button(tab4, text="Go").place(x=400, y = 180)
+entry2 = tk.Entry(tab4, textvariable=input_hand_per_hr, takefocus=0)
+entry2.place(x=350, y = 140)
+entry2.config(fg = 'grey')
+entry2.insert(0, 'Enter hands per hour...' )
+entry2.bind('<FocusIn>', on_entry_click2) 
+entry2.bind('<FocusOut>', on_focusout2)
+
+entry3 = tk.Entry(tab4, textvariable=input_hrs_played, takefocus=0)
+entry3.place(x=600, y = 140)
+entry3.config(fg = 'grey')
+entry3.insert(0,'Enter hours played...')
+entry3.bind('<FocusIn>', on_entry_click3) 
+entry3.bind('<FocusOut>', on_focusout3)
+
+
+
+ttk.Button(tab4, text="Go", command=simTest).place(x=400, y = 180)
 
 
 
