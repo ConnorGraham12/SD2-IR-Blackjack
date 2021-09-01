@@ -3,9 +3,12 @@ from tkinter import Button, StringVar, ttk
 from tkinter import font
 from tkinter.constants import ANCHOR, S
 from tkinter.font import Font, nametofont
+#Imported for Images
 from PIL import ImageTk, Image
-from cv2 import THRESH_TOZERO
-
+#For mathlib charts
+from pandas import DataFrame
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 #Import external functions
 from test3 import startWebcam
 
@@ -93,6 +96,21 @@ startstream = ttk.Button(tab3, text="Start Livefeed", command=startWebcam).place
 #     Simulator components   #
 #						     #
 ##############################
+
+#MathLib Testing Seciton
+data2 = {'Time': [1920,1930,1940,1950,1960,1970,1980,1990,2000,2010],
+         'Bankroll': [9.8,12,8,7.2,6.9,7,6.5,6.2,5.5,6.3]}
+df2 = DataFrame(data2,columns=['Time','Bankroll'])
+
+
+figure2 = plt.Figure(figsize=(9,4), dpi=50)
+ax2 = figure2.add_subplot(111)
+line2 = FigureCanvasTkAgg(figure2, tab4)
+line2.get_tk_widget().place(x=250, y=225)
+df2 = df2[['Time','Bankroll']].groupby('Time').sum()
+df2.plot(kind='line', legend=True, ax=ax2, color='r',marker='o', fontsize=10)
+ax2.set_title('Time Vs. Bankroll')
+
 
 def simTest():
     print('This button starts the simulator')
