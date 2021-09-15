@@ -68,12 +68,12 @@ tabControl.pack(expand = 1, fill ="both", anchor='center')
 
 #Logo
 image1 = Image.open('Resources/blackjackLogo.png')
-photo = ImageTk.PhotoImage(image1.resize((350, 252), Image.ANTIALIAS))
-imgLabel = ttk.Label(tab1, image= photo).place(x=300,y=20)
+photo1 = ImageTk.PhotoImage(image1.resize((350, 252), Image.ANTIALIAS))
+imgLabel1 = ttk.Label(tab1, image= photo1).place(x=300,y=20)
 
 #Lables
-ttk.Label(tab1,text ="The ultimate card counting trainer.").place(x=330,y=275)
-ttk.Label(tab1,text ="Creators: Connor Graham, John Murphy, Tyler Vandermate, Paul Vicino  ").place(x=200,y=350)
+ttk.Label(tab1,text ="The ultimate card counting trainer.").place(x=325,y=285)
+ttk.Label(tab1,text ="Creators: Connor Graham, John Murphy, Tyler Vandermate, Paul Vicino  ").place(x=200,y=370)
 
 ##############################
 #						     #
@@ -81,7 +81,9 @@ ttk.Label(tab1,text ="Creators: Connor Graham, John Murphy, Tyler Vandermate, Pa
 #						     #
 ##############################
 
-
+image2 = Image.open('Resources/stratchart1.jpg')
+photo2 = ImageTk.PhotoImage(image2.resize((330, 402), Image.ANTIALIAS))
+imgLabel2 = ttk.Label(tab2, image= photo2).place(x=500,y=10)
 
 ###########################
 #						  #
