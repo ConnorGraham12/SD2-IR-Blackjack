@@ -4,14 +4,18 @@ from tkinter import font
 from tkinter.constants import ANCHOR, S
 from tkinter.font import Font, nametofont
 import webbrowser  
+
 #Imported for Images
 from PIL import ImageTk, Image
+
 #For mathlib charts
 from pandas import DataFrame
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 #Import external functions
 from test3 import startWebcam
+from test3 import finished
 
 
 root = tk.Tk()
@@ -93,6 +97,8 @@ imgLabel2 = ttk.Label(tab2, image= photo2).place(x=500,y=10)
 
 startstream = ttk.Button(tab3, text="Start Livefeed", command=startWebcam).place(x=400,y=100)
 
+if(finished == 1):
+    print("FINSIHED")
 ##############################
 #						     #
 #     Simulator components   #
@@ -100,6 +106,8 @@ startstream = ttk.Button(tab3, text="Start Livefeed", command=startWebcam).place
 ##############################
 def openWebsite():
     webbrowser.open("https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True)
+
+
 
 #MathPlotLibData
 #MathLib Testing Seciton

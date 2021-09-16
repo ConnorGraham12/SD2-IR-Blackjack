@@ -22,6 +22,8 @@ File: detecting-object.py
 
 # Importing needed library
 import cv2
+global finished
+finished = 0
 
 def startWebcam():
     # Defining lower bounds and upper bounds of founded Mask
@@ -113,11 +115,16 @@ def startWebcam():
 
         # Breaking the loop if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            finished = 1
             break
+            
 
 
     # Destroying all opened windows
-    cv2.destroyAllWindows()
+    
+    cv2.destroyAllWindows(
+    
+    )
 
 
     """
