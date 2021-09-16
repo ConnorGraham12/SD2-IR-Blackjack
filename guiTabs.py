@@ -131,7 +131,7 @@ label.place(x=20, y=10)
 #Question Mark button leads to help website 
 helpImage = Image.open('Resources/questionMark.png')
 helpPhoto = ImageTk.PhotoImage(helpImage.resize((40, 40), Image.ANTIALIAS))
-helpButton = tk.Button(tab4, image= helpPhoto, command=openWebsite, borderwidth=0).place(x=940,y=10)
+helpButton = tk.Button(tab4, image= helpPhoto, command=openWebsite, borderwidth=0).place(x=910,y=10)
 
 # CheckButtons 
 c1 = ttk.Checkbutton(tab4, text='Insurance',variable=insurance, onvalue=1, offvalue=0).place(x=20, y=40)
