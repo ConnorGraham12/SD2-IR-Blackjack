@@ -23,14 +23,12 @@ root.title("SD2 GUI")
 # Icon for window
 root.iconphoto(False, tk.PhotoImage(file='Resources/favicon2.png'))
 
-#Background Image 
-backgroundImage = Image.open('Resources/gradient.png')
-backgroundImg = ImageTk.PhotoImage(backgroundImage.resize((1000, 500), Image.ANTIALIAS))
-
 #Styling 
-bgColor = 'grey'
-style = ttk.Style()
-style.configure('TNotebook.Tab', padding=[20, 12], font=('Helvetica', 20))
+
+style = ttk.Style(root)
+root.tk.call('source', 'Resources/Forest-ttk-theme-master/Forest-ttk-theme-master/forest-dark.tcl')
+style.theme_use('forest-dark')
+# style.configure('TNotebook.Tab', padding=[20, 12], font=('Helvetica', 20))
 
 
 
@@ -71,10 +69,10 @@ tabControl.pack(expand=1, fill="both", anchor='center')
 # root.wm_attributes('-alpha', 0.7)
 
 # Style the tabs
-background_label = tk.Label(tab1, image=backgroundImg).pack()
-background_label = tk.Label(tab2, image=backgroundImg).pack()
-background_label = tk.Label(tab3, image=backgroundImg).pack()
-background_label = tk.Label(tab4, image=backgroundImg).pack()
+background_label = tk.Label(tab1).pack()
+background_label = tk.Label(tab2).pack()
+background_label = tk.Label(tab3).pack()
+background_label = tk.Label(tab4).pack()
 
 
 
@@ -88,11 +86,11 @@ background_label = tk.Label(tab4, image=backgroundImg).pack()
 # Logo
 image1 = Image.open('Resources/blackjackLogo.png')
 photo1 = ImageTk.PhotoImage(image1.resize((350, 252), Image.ANTIALIAS))
-imgLabel1 = ttk.Label(tab1, image=photo1, background=bgColor).place(x=300, y=20)
+imgLabel1 = ttk.Label(tab1, image=photo1).place(x=300, y=20)
 
 # Lables
-ttk.Label(tab1, text="The ultimate card counting trainer.", background=bgColor).place(x=325, y=285)
-ttk.Label(tab1, text="Creators: Connor Graham, John Murphy, Tyler Vandermate, Paul Vicino, Graham West  ", background=bgColor).place(x=150, y=370)
+ttk.Label(tab1, text="The ultimate card counting trainer.").place(x=325, y=285)
+ttk.Label(tab1, text="Creators: Connor Graham, John Murphy, Tyler Vandermate, Paul Vicino, Graham West  ").place(x=150, y=370)
 
 ##############################
 #						     #
@@ -172,17 +170,17 @@ basicStratDeviations = tk.IntVar()
 
 # Variation Label
 label = ttk.Label(tab4, text='Rule Variations:',
-                  font=('Helvetica', 18, 'bold'), background=bgColor)
+                  font=('Helvetica', 18, 'bold'))
 label.place(x=20, y=10)
 
 # Question Mark button leads to help website
 helpImage = Image.open('Resources/questionMark.png')
 helpPhoto = ImageTk.PhotoImage(helpImage.resize((40, 40), Image.ANTIALIAS))
 helpButton = tk.Button(tab4, image=helpPhoto,
-                       command=openWebsite, borderwidth=0, background=bgColor).place(x=910, y=10)
+                       command=openWebsite, borderwidth=0).place(x=910, y=10)
 
 # CheckButtons
-c1 = tk.Checkbutton(tab4, text='Insurance', variable=insurance,bg=bgColor,
+c1 = ttk.Checkbutton(tab4, text='Insurance', variable=insurance,
                      onvalue=1, offvalue=0).place(x=20, y=40)
 c2 = ttk.Checkbutton(tab4, text='Late Surrender Allowed', 
                      variable=lateSurrender, onvalue=1, offvalue=0).place(x=20, y=70)
@@ -196,22 +194,22 @@ c6 = ttk.Checkbutton(tab4, text='Basic Startegy Deviations',
                      variable=basicStratDeviations, onvalue=1, offvalue=0).place(x=20, y=190)
 
 # Sliders
-s1 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal', bg=bgColor)
+s1 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal')
 s1.set(0)
 s1.place(x=140, y=230)
 
-s2 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal', bg=bgColor)
+s2 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal')
 s2.set(0)
 s2.place(x=140, y=280)
 
-s3 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal', bg=bgColor)
+s3 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal')
 s3.set(0)
 s3.place(x=140, y=330)
 
 # Slider Labels
-s1Label = ttk.Label(tab4, text='Slider 1 Label:', background=bgColor).place(x=10, y=250)
-s2Label = ttk.Label(tab4, text='Slider 2 Label:', background=bgColor).place(x=10, y=300)
-s3Label = ttk.Label(tab4, text='Slider 3 Label:', background=bgColor).place(x=10, y=350)
+s1Label = ttk.Label(tab4, text='Slider 1 Label:').place(x=10, y=250)
+s2Label = ttk.Label(tab4, text='Slider 2 Label:').place(x=10, y=300)
+s3Label = ttk.Label(tab4, text='Slider 3 Label:').place(x=10, y=350)
 
 # Run Button
 runButton = ttk.Button(tab4, text="Run", padding=15).place(x=550, y=300)
