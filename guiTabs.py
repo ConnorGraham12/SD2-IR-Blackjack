@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import Button, StringVar, ttk
 from tkinter import font
-from tkinter.constants import ANCHOR, S
+from tkinter.constants import ANCHOR, HORIZONTAL, S
 from tkinter.font import Font, nametofont
 import webbrowser
+import time
 
 # Imported for Images
 from PIL import ImageTk, Image
@@ -15,6 +16,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Import external functions
 from test3 import startWebcam
+# from carddetection import start
 
 root = tk.Tk()
 
@@ -22,6 +24,8 @@ root = tk.Tk()
 root.title("SD2 GUI")
 # Icon for window
 root.iconphoto(False, tk.PhotoImage(file='Resources/favicon2.png'))
+helpImage = Image.open('Resources/questionMark.png')
+helpPhoto = ImageTk.PhotoImage(helpImage.resize((40, 40), Image.ANTIALIAS))
 
 #Styling 
 
@@ -98,10 +102,75 @@ ttk.Label(tab1, text="Creators: Connor Graham, John Murphy, Tyler Vandermate, Pa
 #						     #
 ##############################
 
+#True count incrementing Stystem
+trueCount = 0
+
+def trueCountDown():
+    global trueCount
+    if trueCount <= 0:
+        pass 
+    else:
+        trueCount -= 1
+        updateText1 = ("True Count: " + str(trueCount))
+        trueCountLabel.configure(text=updateText1)
+        trueCountLabel.update()
+
+def trueCountUp():
+    global trueCount
+    trueCount+= 1
+    updateText2 = ("True Count: " + str(trueCount))
+    trueCountLabel.configure(text=updateText2)
+    trueCountLabel.update()
+
+
+#####TODO CHANGE TO STRATEGY CHARTS SPECIFIC INFO PAGE 
+def openWebsiteStrat():
+    webbrowser.open("https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True)
+
+
 image2 = Image.open('Resources/stratchart1.jpg')
 photo2 = ImageTk.PhotoImage(image2.resize((330, 402), Image.ANTIALIAS))
 imgLabel2 = ttk.Label(tab2, image=photo2).place(x=500, y=10)
 
+#Up Increment
+upButtonImg = Image.open('Resources/upArrow.png')
+upButtonImg2 = ImageTk.PhotoImage(upButtonImg.resize((80, 40), Image.ANTIALIAS))
+upButton = ttk.Button(tab2, image=upButtonImg2, command=trueCountUp).place(x=300, y = 80)
+
+#Down Increment
+downButtonImg = Image.open('Resources/downArrow.png')
+downButtonImg2 = ImageTk.PhotoImage(downButtonImg.resize((80, 40), Image.ANTIALIAS))
+downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place(x=300, y = 200)
+
+#Label GEts updated by TCUp  and TCDown
+trueCountLabel = ttk.Label(tab2, text="True Count: 0")
+trueCountLabel.place(x=300, y = 150)
+
+
+#CheckBoxes
+insuranceTC = tk.IntVar()
+lateSurrenderTC = tk.IntVar()
+doubleAfterSplitTC = tk.IntVar()
+dealerStandTC = tk.IntVar()
+resplitAcesTC = tk.IntVar()
+basicStratDeviationsTC = tk.IntVar()
+
+tc1 = ttk.Checkbutton(tab2, text='Insurance', variable=insuranceTC,
+                     onvalue=1, offvalue=0).place(x=20, y=40)
+tc2 = ttk.Checkbutton(tab2, text='Late Surrender Allowed', 
+                     variable=lateSurrenderTC, onvalue=1, offvalue=0).place(x=20, y=70)
+tc3 = ttk.Checkbutton(tab2, text='Double After Split',
+                     variable=doubleAfterSplitTC, onvalue=1, offvalue=0).place(x=20, y=100)
+tc4 = ttk.Checkbutton(tab2, text='Dealer Stands on soft 17 ',
+                     variable=dealerStandTC, onvalue=1, offvalue=0).place(x=20, y=130)
+tc5 = ttk.Checkbutton(tab2, text='Resplit aces', variable=resplitAcesTC,
+                     onvalue=1, offvalue=0).place(x=20, y=160)
+tc6 = ttk.Checkbutton(tab2, text='Basic Startegy Deviations',
+                     variable=basicStratDeviationsTC, onvalue=1, offvalue=0).place(x=20, y=190)
+
+
+helpButton = ttk.Button(tab2, image=helpPhoto,
+                       command=openWebsiteStrat).place(x=910, y=10)
 ###########################
 #						  #
 #   Livefeed components   #
@@ -120,15 +189,9 @@ def changePage():
     l3.place(x=100,y=300)
     l4.place(x=650,y=300)
     startstream.place(x=10000,y=10000)
-    startIR()
+    start()
 
-def startIR():
-    
 
-    finished = startWebcam()
-    if(finished == 1 ):
-        l5.place(x=250,y=200)
-        print("PROGRAM EXITED")
 
 startstream = ttk.Button(tab3, text="Start Livefeed",
                          command=changePage).place(x=400, y=100)
@@ -139,8 +202,8 @@ startstream = ttk.Button(tab3, text="Start Livefeed",
 #						     #
 ##############################
 
-
-def openWebsite():
+#####TODO CHANGE TO SIMULATOR SPECIFIC INFO PAGE 
+def openWebsiteSim():
     webbrowser.open(
         "https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True)
 
@@ -174,10 +237,10 @@ label = ttk.Label(tab4, text='Rule Variations:',
 label.place(x=20, y=10)
 
 # Question Mark button leads to help website
-helpImage = Image.open('Resources/questionMark.png')
-helpPhoto = ImageTk.PhotoImage(helpImage.resize((40, 40), Image.ANTIALIAS))
-helpButton = tk.Button(tab4, image=helpPhoto,
-                       command=openWebsite, borderwidth=0).place(x=910, y=10)
+# helpImage = Image.open('Resources/questionMark.png')
+# helpPhoto = ImageTk.PhotoImage(helpImage.resize((40, 40), Image.ANTIALIAS))
+helpButton = ttk.Button(tab4, image=helpPhoto,
+                       command=openWebsiteSim).place(x=910, y=10)
 
 # CheckButtons
 c1 = ttk.Checkbutton(tab4, text='Insurance', variable=insurance,
@@ -196,23 +259,38 @@ c6 = ttk.Checkbutton(tab4, text='Basic Startegy Deviations',
 # Sliders
 s1 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal')
 s1.set(0)
-s1.place(x=140, y=230)
+s1.place(x=170, y=230)
 
 s2 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal')
 s2.set(0)
-s2.place(x=140, y=280)
+s2.place(x=170, y=280)
 
 s3 = tk.Scale(tab4, from_=0, to=1000, orient='horizontal')
 s3.set(0)
-s3.place(x=140, y=330)
+s3.place(x=170, y=330)
 
 # Slider Labels
-s1Label = ttk.Label(tab4, text='Slider 1 Label:').place(x=10, y=250)
-s2Label = ttk.Label(tab4, text='Slider 2 Label:').place(x=10, y=300)
-s3Label = ttk.Label(tab4, text='Slider 3 Label:').place(x=10, y=350)
+s1Label = ttk.Label(tab4, text='Starting Bankroll:').place(x=10, y=250)
+s2Label = ttk.Label(tab4, text='Hands per hour:').place(x=10, y=300)
+s3Label = ttk.Label(tab4, text='Hours Played:').place(x=10, y=350)
 
+#Progress Bar
+
+
+progress = ttk.Progressbar(tab4, orient=HORIZONTAL,
+              length = 300, mode = 'determinate')
+progress.place(x=475, y=275)
+
+def step():
+    for i in range(11):
+        root.update_idletasks()
+        progress['value'] += 10
+        time.sleep(0.2)
+    progress['value'] = 0
+
+        
 # Run Button
-runButton = ttk.Button(tab4, text="Run", padding=15).place(x=550, y=300)
+runButton = ttk.Button(tab4, text="Run", padding=15, command=step).place(x=575, y=300)
 
 
 root.mainloop()
