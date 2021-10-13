@@ -15,13 +15,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Import external functions
-from test3 import startWebcam
+from CardDetect.test3 import startWebcam
 # from carddetection import start
 
 root = tk.Tk()
 
 # Window Name
-root.title("SD2 GUI")
+root.title("SD Blackjack")
 # Icon for window
 root.iconphoto(False, tk.PhotoImage(file='Resources/favicon2.png'))
 helpImage = Image.open('Resources/questionMark.png')
@@ -111,15 +111,15 @@ def trueCountDown():
         pass 
     else:
         trueCount -= 1
-        updateText1 = ("True Count: " + str(trueCount))
-        trueCountLabel.configure(text=updateText1)
+        updateText = ("True Count: " + str(trueCount))
+        trueCountLabel.configure(text=updateText)
         trueCountLabel.update()
 
 def trueCountUp():
     global trueCount
     trueCount+= 1
-    updateText2 = ("True Count: " + str(trueCount))
-    trueCountLabel.configure(text=updateText2)
+    updateText = ("True Count: " + str(trueCount))
+    trueCountLabel.configure(text=updateText)
     trueCountLabel.update()
 
 
@@ -129,22 +129,22 @@ def openWebsiteStrat():
 
 
 image2 = Image.open('Resources/stratchart1.jpg')
-photo2 = ImageTk.PhotoImage(image2.resize((330, 402), Image.ANTIALIAS))
-imgLabel2 = ttk.Label(tab2, image=photo2).place(x=500, y=10)
+photo2 = ImageTk.PhotoImage(image2.resize((280, 370), Image.ANTIALIAS))
+imgLabel2 = ttk.Label(tab2, image=photo2).place(x=610, y=10)
 
 #Up Increment
 upButtonImg = Image.open('Resources/upArrow.png')
-upButtonImg2 = ImageTk.PhotoImage(upButtonImg.resize((80, 40), Image.ANTIALIAS))
-upButton = ttk.Button(tab2, image=upButtonImg2, command=trueCountUp).place(x=300, y = 80)
+upButtonImg2 = ImageTk.PhotoImage(upButtonImg.resize((70, 40), Image.ANTIALIAS))
+upButton = ttk.Button(tab2, image=upButtonImg2, command=trueCountUp).place(x=500, y = 80)
 
 #Down Increment
 downButtonImg = Image.open('Resources/downArrow.png')
-downButtonImg2 = ImageTk.PhotoImage(downButtonImg.resize((80, 40), Image.ANTIALIAS))
-downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place(x=300, y = 200)
+downButtonImg2 = ImageTk.PhotoImage(downButtonImg.resize((70, 40), Image.ANTIALIAS))
+downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place(x=500, y = 200)
 
 #Label GEts updated by TCUp  and TCDown
 trueCountLabel = ttk.Label(tab2, text="True Count: 0")
-trueCountLabel.place(x=300, y = 150)
+trueCountLabel.place(x=475, y = 150)
 
 
 #CheckBoxes
@@ -185,11 +185,12 @@ l5 = tk.Label(tab3, text="Reset page")
 
 def changePage():
     l1.place(x=100,y=20)
+    l1.update()
     l2.place(x=650,y=20)
     l3.place(x=100,y=300)
     l4.place(x=650,y=300)
     startstream.place(x=10000,y=10000)
-    start()
+    startWebcam()
 
 
 
