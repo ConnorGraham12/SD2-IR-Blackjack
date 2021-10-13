@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Import external functions
-from CardDetect.test3 import startWebcam
-# from carddetection import start
+#from CardDetect.test3 import startWebcam
+from cardDetection.carddetection import RunIR
 
 root = tk.Tk()
 
@@ -189,8 +189,8 @@ def changePage():
     l2.place(x=650,y=20)
     l3.place(x=100,y=300)
     l4.place(x=650,y=300)
-    startstream.place(x=10000,y=10000)
-    startWebcam()
+    #startstream.place(x=10000,y=10000)
+    RunIR()
 
 
 
