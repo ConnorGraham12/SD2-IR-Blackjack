@@ -16,6 +16,7 @@ import webbrowser
 import time
 import cv2
 import numpy as np
+import threading
 
 # Imported for Images
 from PIL import ImageTk, Image
@@ -79,7 +80,6 @@ tabControl.add(tab4, text="Simulator")
 
 # Packing all tabs
 tabControl.pack(expand=1, fill="both", anchor="center")
-
 
 ###########################
 # 						  #
@@ -456,9 +456,9 @@ def RunIR():
         imgtk = ImageTk.PhotoImage(image=im)
         lmain.configure(image=imgtk)
         lmain.update()
-        # Breaking the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+        with stopIR_Lock:
+            if stopIR == 1:
+                break
 
     # Releasing camera
     camera.release()
@@ -471,17 +471,32 @@ l2 = tk.Label(tab3, text="")
 l3 = tk.Label(tab3, text="Decks Remaining:")
 l4 = tk.Label(tab3, text="Current Bet:")
 l5 = tk.Label(tab3, text="Reset page")
+stopIR = 0
 
 
-def changePage():
+#threading to stop running IR program 
+stopIR = 0
+stopIR_Lock = threading.Lock()
+thread = threading.Thread(target=RunIR, daemon=True)
+
+def startStream():
+    startStream.place(x=2000, y=800)
+    endStream.place(x=675, y=400)
     l1.place(x=675, y=50)
-    l1.update()
-    l1.place(x=715, y=50)
-    updateRunningCount()
-    # RunIR()
+    l2.place(x=715, y=50)
+    
+    RunIR()
 
+def endStream():
+    global stopIR
+    with stopIR_Lock:
+        stopIR ==1
+    endStream.place.place(x=2000, y=800)   
+    startStream.place(x=675, y=400)
 
-startstream = ttk.Button(tab3, text="Start Livefeed", command=changePage).place(x=400, y=100)
+startStream = ttk.Button(tab3, text="Start Livefeed", command=startStream)
+startStream.place(x=675, y=400)
+endStream = ttk.Button(tab3, text="End Livefeed", command=endStream)
 
 ##############################
 # 						     #

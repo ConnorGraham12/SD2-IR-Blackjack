@@ -3,9 +3,13 @@
 import numpy as np
 import cv2
 import time
+import tkinter as tk
+import numpy as np
+from PIL import ImageTk, Image
+# from guiTabs import lmain, running_Count
 
 
-def RunIR():
+def RunIR(lmain, running_Count):
 
     camera = cv2.VideoCapture(0)
 
@@ -20,7 +24,6 @@ def RunIR():
     network = cv2.dnn.readNetFromDarknet(
         "cardDetection/train.cfg", "cardDetection/card_chip.weights"
     )
-    
 
     network.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     network.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
@@ -177,6 +180,8 @@ def RunIR():
                 )
 
                 x, y, width, heighth = bounding_boxes[i]
+                #####TODO
+
                 print(
                     "Location of",
                     labels[int(class_numbers[i])],
@@ -189,16 +194,21 @@ def RunIR():
 
                 send.append((labels[int(class_numbers[i])], x, y))
             print("The pairs are", pairs(send))
-
+            running_Count.append(labels[int(class_numbers[i])])
+            # updateRunningCount()
         # Showing results obtained from camera in Real Time
 
         # Showing current frame with detected objects
         # Giving name to the window with current frame
         # And specifying that window is resizable
-        cv2.namedWindow("YOLO v3 Real Time Detections", cv2.WINDOW_NORMAL)
+        # cv2.namedWindow("YOLO v3 Real Time Detections", cv2.WINDOW_NORMAL)
         # Pay attention! 'cv2.imshow' takes images in BGR format
-        cv2.imshow("YOLO v3 Real Time Detections", frame)
-
+        # cv2.imshow("YOLO v3 Real Time Detections", frame)
+        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+        im = Image.fromarray(cv2image)
+        imgtk = ImageTk.PhotoImage(image=im)
+        lmain.configure(image=imgtk)
+        lmain.update()
         # Breaking the loop if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
