@@ -4,19 +4,19 @@
 # get edge calc working
 # light/dark mode
 # tk sliders to ttk
-
+# Error catching for if camera is not detected
 
 from logging import currentframe
 import tkinter as tk
-from tkinter import Button, StringVar, ttk
+from tkinter import Button, IntVar, StringVar, ttk
 from tkinter import font
-from tkinter.constants import ANCHOR, DISABLED, HORIZONTAL, S
+from tkinter.constants import ANCHOR, DISABLED, HORIZONTAL, RIDGE, S
 from tkinter.font import Font, nametofont
 import webbrowser
 import time
 import cv2
 import numpy as np
-import threading
+
 
 # Imported for Images
 from PIL import ImageTk, Image
@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Import external functions
+
 # from CardDetect.test3 import startWebcam
 # from cardDetection.carddetection import RunIR
 from houseEdgeCalc.EdgeCalc import edgeCalc
@@ -235,6 +236,7 @@ tc6 = ttk.Checkbutton(
 helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsiteStrat).place(
     x=910, y=10
 )
+
 T1 = tk.Label(tab2, text="    ", borderwidth=2, relief="solid")
 T1.place(x=20, y=240)
 
@@ -244,20 +246,23 @@ T1.place(x=20, y=240)
 # 						  #
 ###########################
 
+stopIR = 0
 
-camera = cv2.VideoCapture(0)
 imageFrame = tk.Frame(tab3, width=600, height=500)
 imageFrame.grid(row=0, column=0, padx=10, pady=2)
 lmain = tk.Label(imageFrame)
 lmain.grid(row=0, column=0)
-running_Count = []
-def updateRunningCount():
-    running_Count.append(2)
-    l2.configure(text = running_Count)
+
+running_Count = 0
+
+def updateRunningCount(running_Count):
+    l2.configure(text=running_Count)
     l2.update
+
 
 def RunIR():
 
+    global stopIR
     camera = cv2.VideoCapture(0)
 
     # Preparing variables for spatial dimensions of the frames
@@ -318,7 +323,7 @@ def RunIR():
         ).values()
 
     # Defining loop for catching frames
-    while True:
+    while stopIR == 0:
         # Capturing frame-by-frame from camera
         _, frame = camera.read()
 
@@ -441,8 +446,8 @@ def RunIR():
 
                 send.append((labels[int(class_numbers[i])], x, y))
             print("The pairs are", pairs(send))
-            running_Count.append(labels[int(class_numbers[i])])
-            updateRunningCount()
+            running_Count = labels[int(class_numbers[i])]
+            updateRunningCount(running_Count)
         # Showing results obtained from camera in Real Time
 
         # Showing current frame with detected objects
@@ -456,9 +461,6 @@ def RunIR():
         imgtk = ImageTk.PhotoImage(image=im)
         lmain.configure(image=imgtk)
         lmain.update()
-        with stopIR_Lock:
-            if stopIR == 1:
-                break
 
     # Releasing camera
     camera.release()
@@ -471,28 +473,41 @@ l2 = tk.Label(tab3, text="")
 l3 = tk.Label(tab3, text="Decks Remaining:")
 l4 = tk.Label(tab3, text="Current Bet:")
 l5 = tk.Label(tab3, text="Reset page")
-stopIR = 0
 
-
-#threading to stop running IR program 
-stopIR = 0
-stopIR_Lock = threading.Lock()
-thread = threading.Thread(target=RunIR, daemon=True)
+loadingGIf = Image.open("Resources/Loading.gif")
+loadingImg = ImageTk.PhotoImage(loadingGIf.resize((40, 40), Image.ANTIALIAS))
+loadingLabel = tk.Label(tab3, image=loadingImg).place(x=510, y=90)
+# def Loading():
+    
+# )
 
 def startStream():
+    # Chnage Buttons
     startStream.place(x=2000, y=800)
     endStream.place(x=675, y=400)
+
+    # Place Labels
     l1.place(x=675, y=50)
-    l2.place(x=715, y=50)
-    
+    l2.place(x=880, y=50)
+
+    # Start/Stop Variables
+    global stopIR
+    stopIR = 0
+
+    # Run Program
     RunIR()
 
+
 def endStream():
+
+    # Start/Stop Variables
     global stopIR
-    with stopIR_Lock:
-        stopIR ==1
-    endStream.place.place(x=2000, y=800)   
+    stopIR = 1
+
+    # Change Buttons
+    endStream.place(x=2000, y=800)
     startStream.place(x=675, y=400)
+
 
 startStream = ttk.Button(tab3, text="Start Livefeed", command=startStream)
 startStream.place(x=675, y=400)
@@ -541,8 +556,6 @@ label = ttk.Label(tab4, text="Rule Variations:", font=("Helvetica", 18, "bold"))
 label.place(x=20, y=10)
 
 # Question Mark button leads to help website
-# helpImage = Image.open('Resources/questionMark.png')
-# helpPhoto = ImageTk.PhotoImage(helpImage.resize((40, 40), Image.ANTIALIAS))
 helpButton = ttk.Button(tab4, image=helpPhoto, command=openWebsiteSim).place(
     x=910, y=10
 )
@@ -572,7 +585,7 @@ c6 = ttk.Checkbutton(
 ).place(x=20, y=190)
 
 # Sliders
-s1 = tk.Scale(tab4, from_=0, to=1000, orient="horizontal")
+s1 = ttk.Scale(tab4, from_=0, to=1000, orient="horizontal")
 s1.set(0)
 s1.place(x=170, y=230)
 
