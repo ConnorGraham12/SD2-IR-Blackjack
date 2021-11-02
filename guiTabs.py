@@ -1,10 +1,14 @@
 # # TODO
-# Get open CV window inside gui
+# $$Get open CV window inside gui 
 # experiment with packing to make gui resizable
 # get edge calc working
 # light/dark mode
 # tk sliders to ttk
 # Error catching for if camera is not detected
+#Label on livestream needs changing 
+# help button on sim needs moved 
+# truncate values for sliders
+
 
 from logging import currentframe
 import tkinter as tk
@@ -16,6 +20,7 @@ import webbrowser
 import time
 import cv2
 import numpy as np
+import math
 
 
 # Imported for Images
@@ -30,7 +35,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # from CardDetect.test3 import startWebcam
 # from cardDetection.carddetection import RunIR
-from houseEdgeCalc.EdgeCalc import edgeCalc
+# from houseEdgeCalc.EdgeCalc import edgeCalc
 
 root = tk.Tk()
 
@@ -166,15 +171,15 @@ trueCountLabel.place(x=475, y=150)
 ##
 def runEdgeCalc():
     (
-        edgeCalc(
-            insuranceTC.get(),
-            lateSurrenderTC.get(),
-            doubleAfterSplitTC.get(),
-            dealerStandTC.get(),
-            resplitAcesTC.get(),
-            basicStratDeviationsTC.get(),
-            decks.get(),
-        )
+        # edgeCalc(
+        #     insuranceTC.get(),
+        #     lateSurrenderTC.get(),
+        #     doubleAfterSplitTC.get(),
+        #     dealerStandTC.get(),
+        #     resplitAcesTC.get(),
+        #     basicStratDeviationsTC.get(),
+        #     decks.get(),
+        # )
     )
     T1.insert(0, "test")
     T1.update()
@@ -190,6 +195,7 @@ basicStratDeviationsTC = tk.IntVar()
 decks = tk.IntVar()
 
 ttk.Label(tab2, text="Number of Decks:").place(x=150, y=10)
+
 # Radio Buttons
 ttk.Radiobutton(tab2, text="1", variable=decks, value=0).place(x=140, y=40)
 ttk.Radiobutton(tab2, text="2", variable=decks, value=1).place(x=180, y=40)
@@ -248,11 +254,12 @@ T1.place(x=20, y=240)
 
 stopIR = 0
 
-imageFrame = tk.Frame(tab3, width=600, height=500)
+imageFrame = tk.Frame(tab3, width='600', height='500')
+
 imageFrame.grid(row=0, column=0, padx=10, pady=2)
 lmain = tk.Label(imageFrame)
-lmain.grid(row=0, column=0)
-
+lmain.grid(row=0, column=0, columnspan=10)
+lmain.config(bd=1, relief=tk.SOLID)
 running_Count = 0
 
 def updateRunningCount(running_Count):
@@ -283,8 +290,7 @@ def RunIR():
     # Getting list with names of all layers from YOLO v3 network
     layers_names_all = network.getLayerNames()
 
-    # Getting only output layers' names that we need from YOLO v3 algorithm
-    # with function that returns indexes of layers with unconnected outputs
+
     layers_names_output = [
         layers_names_all[i[0] - 1] for i in network.getUnconnectedOutLayers()
     ]
@@ -292,12 +298,8 @@ def RunIR():
     # Setting minimum probability to eliminate weak predictions
     probability_minimum = 0.5
 
-    # Setting threshold for filtering weak bounding boxes
-    # with non-maximum suppression
     threshold = 0.3
 
-    # Generating colours for representing every detected object
-    # with function randint(low, high=None, size=None, dtype='l')
     colours = np.random.randint(0, 255, size=(len(labels), 3), dtype="uint8")
 
     # gives pairs of cards
@@ -327,35 +329,23 @@ def RunIR():
         # Capturing frame-by-frame from camera
         _, frame = camera.read()
 
-        # Getting spatial dimensions of the frame
-        # we do it only once from the very beginning
-        # all other frames have the same dimension
+
         if w is None or h is None:
             # Slicing from tuple only first two elements
             h, w = frame.shape[:2]
 
-        # Getting blob from current frame
-        # The 'cv2.dnn.blobFromImage' function returns 4-dimensional blob from current
-        # frame after mean subtraction, normalizing, and RB channels swapping
-        # Resulted shape has number of frames, number of channels, width and height
-        # E.G.:
-        # blob = cv2.dnn.blobFromImage(image, scalefactor=1.0, size, mean, swapRB=True)
+
         blob = cv2.dnn.blobFromImage(
             frame, 1 / 255.0, (416, 416), swapRB=True, crop=False
         )
 
-        # Implementing forward pass with our blob and only through output layers
-        # Calculating at the same time, needed time for forward pass
-        network.setInput(blob)  # setting blob as input to the network
+
+        network.setInput(blob)  
         start = time.time()
         output_from_network = network.forward(layers_names_output)
         end = time.time()
 
-        # Showing spent time for single current frame
-        # print('Current frame took {:.5f} seconds'.format(end - start))
 
-        # Preparing lists for detected bounding boxes,
-        # obtained confidences and class's number
         bounding_boxes = []
         confidences = []
         class_numbers = []
@@ -393,18 +383,11 @@ def RunIR():
         if len(results) > 0:
             # Going through indexes of results
             for i in results.flatten():
-                # Getting current bounding box coordinates,
-                # its width and height
+
                 x_min, y_min = bounding_boxes[i][0], bounding_boxes[i][1]
                 box_width, box_height = bounding_boxes[i][2], bounding_boxes[i][3]
 
-                # Preparing colour for current bounding box
-                # and converting from numpy array to list
                 colour_box_current = colours[class_numbers[i]].tolist()
-
-                # # # Check point
-                # print(type(colour_box_current))  # <class 'list'>
-                # print(colour_box_current)  # [172 , 10, 127]
 
                 # Drawing bounding box on the original current frame
                 cv2.rectangle(
@@ -448,14 +431,7 @@ def RunIR():
             print("The pairs are", pairs(send))
             running_Count = labels[int(class_numbers[i])]
             updateRunningCount(running_Count)
-        # Showing results obtained from camera in Real Time
 
-        # Showing current frame with detected objects
-        # Giving name to the window with current frame
-        # And specifying that window is resizable
-        # cv2.namedWindow("YOLO v3 Real Time Detections", cv2.WINDOW_NORMAL)
-        # Pay attention! 'cv2.imshow' takes images in BGR format
-        # cv2.imshow("YOLO v3 Real Time Detections", frame)
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         im = Image.fromarray(cv2image)
         imgtk = ImageTk.PhotoImage(image=im)
@@ -474,17 +450,11 @@ l3 = tk.Label(tab3, text="Decks Remaining:")
 l4 = tk.Label(tab3, text="Current Bet:")
 l5 = tk.Label(tab3, text="Reset page")
 
-loadingGIf = Image.open("Resources/Loading.gif")
-loadingImg = ImageTk.PhotoImage(loadingGIf.resize((40, 40), Image.ANTIALIAS))
-loadingLabel = tk.Label(tab3, image=loadingImg).place(x=510, y=90)
-# def Loading():
-    
-# )
 
 def startStream():
     # Chnage Buttons
     startStream.place(x=2000, y=800)
-    endStream.place(x=675, y=400)
+    endStream.place(x=675, y=350)
 
     # Place Labels
     l1.place(x=675, y=50)
@@ -506,12 +476,12 @@ def endStream():
 
     # Change Buttons
     endStream.place(x=2000, y=800)
-    startStream.place(x=675, y=400)
+    startStream.place(x=675, y=350)
 
 
-startStream = ttk.Button(tab3, text="Start Livefeed", command=startStream)
-startStream.place(x=675, y=400)
-endStream = ttk.Button(tab3, text="End Livefeed", command=endStream)
+startStream = ttk.Button(tab3, text="Start Livefeed", padding=15, command=startStream)
+startStream.place(x=675, y=350)
+endStream = ttk.Button(tab3, text="End Livefeed", padding=15, command=endStream)
 
 ##############################
 # 						     #
@@ -535,12 +505,14 @@ data2 = {
 df2 = DataFrame(data2, columns=["Time", "Bankroll"])
 
 # MathPlotLib Graph
-figure2 = plt.Figure(figsize=(9, 4), dpi=60)
+figure2 = plt.Figure(figsize=(9, 4), dpi=65)
 ax2 = figure2.add_subplot(111)
 line2 = FigureCanvasTkAgg(figure2, tab4)
 line2.get_tk_widget().place(x=350, y=25)
 df2 = df2[["Time", "Bankroll"]].groupby("Time").sum()
-df2.plot(kind="line", legend=True, ax=ax2, color="r", marker="o", fontsize=10)
+df2.plot(kind="line", legend=True, ax=ax2, color="g", marker="o", fontsize=20)
+figure2.set_facecolor('xkcd:grey')
+ax2.set_facecolor('xkcd:grey')
 ax2.set_title("Time Vs. Bankroll")
 
 # Rule Variatiions
@@ -584,34 +556,66 @@ c6 = ttk.Checkbutton(
     offvalue=0,
 ).place(x=20, y=190)
 
+#Kelly Bets Radio
+ttk.Radiobutton(tab4, text="Kelly Bet", variable=decks, value=0).place(x=20, y=400)
+ttk.Radiobutton(tab4, text="Flat Bet", variable=decks, value=1).place(x=110, y=400)
+# value = 0
+# current_value = 0.1
+current_valueROR = tk.DoubleVar(value = .1)
+current_valueBR = tk.IntVar(value = 0)
+
+#Functions for Risk of Ruin slider
+def riskOfRuin():
+    # print(current_value.get())
+    tmp = -math.log(current_valueROR.get(), 2)
+    ror = math.exp(-2/tmp)
+    return str('{: .4f}'.format(ror))
+    
+
+def slider_changedRor(event):
+    s2Label = ttk.Label(tab4, text=riskOfRuin())
+    s2Label.place(x=280, y=280)
+    s2Label.configure(text=riskOfRuin())
+
+def bankroll():
+    # print(current_valueBR.get())
+    val = current_valueBR.get()
+    tmp = math.pow(val, 4)
+    return str('{: .1f}'.format(tmp)) 
+
+
+def slider_changedBR(event):
+    s1Label = ttk.Label(tab4, text=bankroll())
+    s1Label.place(x=280, y=230)
+    s1Label.configure(text=bankroll())
+    s1Label.update()
+
+
+
 # Sliders
-s1 = ttk.Scale(tab4, from_=0, to=1000, orient="horizontal")
-s1.set(0)
+s1 = ttk.Scale(tab4, from_=0, to=47, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
 s1.place(x=170, y=230)
 
-s2 = tk.Scale(tab4, from_=0, to=1000, orient="horizontal")
-s2.set(0)
+s2 = ttk.Scale(tab4, from_=0.5, to=0.999, orient="horizontal", command=slider_changedRor, variable=current_valueROR)
+# s2.set(0)
 s2.place(x=170, y=280)
 
-s3 = tk.Scale(tab4, from_=0, to=1000, orient="horizontal")
+
+s3 = ttk.Scale(tab4, from_=0, to=5000000, orient="horizontal")
 s3.set(0)
 s3.place(x=170, y=330)
 
 # Slider Labels
 s1Label = ttk.Label(tab4, text="Starting Bankroll:").place(x=10, y=250)
-s2Label = ttk.Label(tab4, text="Hands per hour:").place(x=10, y=300)
-s3Label = ttk.Label(tab4, text="Hours Played:").place(x=10, y=350)
-# Slider Values Labels
-s1ValLabel = ttk.Label(tab4, text="Starting Bankroll:")
-s2ValLabel = ttk.Label(tab4, text="Hands per hour:")
-s3ValLabel = ttk.Label(tab4, text="Hours Played:")
+s2Label = ttk.Label(tab4, text="Risk of Ruin:").place(x=10, y=300)
+s3Label = ttk.Label(tab4, text="Rounds Played:").place(x=10, y=350)
+
+
 # Progress Bar
-
-
 progress = ttk.Progressbar(tab4, orient=HORIZONTAL, length=300, mode="determinate")
-progress.place(x=475, y=275)
+progress.place(x=475, y=305)
 
-
+# Step Fucntion to iterate loading bar 
 def step():
     for i in range(11):
         root.update_idletasks()
@@ -621,7 +625,7 @@ def step():
 
 
 # Run Button
-runButton = ttk.Button(tab4, text="Run", padding=15, command=step).place(x=575, y=300)
+runButton = ttk.Button(tab4, text="Run", padding=15, command=step).place(x=575, y=330)
 
 
 root.mainloop()
