@@ -31,11 +31,13 @@ from pandas import DataFrame
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Import external functions
-
-# from CardDetect.test3 import startWebcam
-# from cardDetection.carddetection import RunIR
-# from houseEdgeCalc.EdgeCalc import edgeCalc
+##############
+# DEMO ONLY IMPORTS
+from blackjack_hi_low import Table
+from player import Player
+from dealer import Dealer
+from card import Card
+from hand import Hand
 
 root = tk.Tk()
 
@@ -498,22 +500,75 @@ def openWebsiteSim():
 
 # MathPlotLibData
 # MathLib Testing Seciton
-data2 = {
-    "Time": [1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010],
-    "Bankroll": [9.8, 12, 8, 7.2, 6.9, 7, 6.5, 6.2, 5.5, 6.3],
-}
-df2 = DataFrame(data2, columns=["Time", "Bankroll"])
+bankrollvsTime = []
+def demoDay():
+    #TODO DELETE DEMO ONLY TEST 
+    num_decks = 8
+    deck_pen = 0.75
+    min_bet = 10
+    max_bet = 1000
 
-# MathPlotLib Graph
-figure2 = plt.Figure(figsize=(9, 4), dpi=65)
-ax2 = figure2.add_subplot(111)
-line2 = FigureCanvasTkAgg(figure2, tab4)
-line2.get_tk_widget().place(x=350, y=25)
-df2 = df2[["Time", "Bankroll"]].groupby("Time").sum()
-df2.plot(kind="line", legend=True, ax=ax2, color="g", marker="o", fontsize=20)
-figure2.set_facecolor('xkcd:grey')
-ax2.set_facecolor('xkcd:grey')
-ax2.set_title("Time Vs. Bankroll")
+    total_rounds_played = 15000
+    start_stack_size = 50000
+    betting_units = 200
+    num_bins = 500
+
+    game = Table(num_decks, deck_pen, min_bet, max_bet)
+    player_list = []
+
+    player_list.append(Player(0, start_stack_size, betting_units, '1-12'))
+    player_list[0].take_seat(0, game)
+
+
+    # ONLY WORKS WHEN 1 PLAYER IS SITTING AND MUST BE IN SEAT INDEX ZERO!!!
+    # (hotfix for demo)
+    
+    bankroll_over_time = game.play_n_rounds(total_rounds_played, num_bins)
+    
+        
+
+
+    rounds = np.linspace(0, total_rounds_played, retstep=True, num=num_bins, dtype=int, axis=0)
+    # print("bak_roll = " + str((bankroll_over_time)))
+    # print("rounds[0]_len = " + str((rounds[0])))
+    # plt.scatter(rounds[0], bankroll_over_time)
+    # plt.xlabel("rounds")
+    # plt.ylabel("bankroll")
+    # plt.show(block=True)
+    
+    global bankrollvsTime
+    bankrollvsTime = DataFrame(data = np.column_stack((rounds[0],bankroll_over_time)), columns=['Rounds', 'Bankroll']).groupby("Rounds").sum()
+    # print(bankrollvsTime)
+    #####
+    # df2 = DataFrame([rounds,bankroll_over_time], columns=["rounds", "Bankroll"])
+
+    # MathPlotLib Graph
+    figure2 = plt.Figure(figsize=(9, 4), dpi=65)
+
+    ax2 = figure2.add_subplot(111)
+
+    line2 = FigureCanvasTkAgg(figure2, tab4)
+
+    line2.get_tk_widget().place(x=350, y=25)
+
+    # df2 = bankrollvsTime[["Rounds", "Bankroll"]].groupby("Time").sum()
+
+    bankrollvsTime.plot(kind="line", legend=True, ax=ax2, color="g", marker="o", fontsize=20)
+
+    figure2.set_facecolor('xkcd:grey')
+
+    ax2.set_facecolor('xkcd:grey')
+
+    ax2.set_title("Time Vs. Bankroll")
+
+
+
+    # END DELETE
+
+
+
+
+
 
 # Rule Variatiions
 insurance = tk.IntVar()
@@ -591,7 +646,6 @@ def slider_changedBR(event):
     s1Label.update()
 
 
-
 # Sliders
 s1 = ttk.Scale(tab4, from_=0, to=47, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
 s1.place(x=170, y=230)
@@ -620,8 +674,9 @@ def step():
     for i in range(11):
         root.update_idletasks()
         progress["value"] += 10
-        time.sleep(0.2)
+        time.sleep(0.1)
     progress["value"] = 0
+    demoDay()
 
 
 # Run Button
