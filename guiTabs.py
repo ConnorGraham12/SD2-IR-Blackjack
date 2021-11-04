@@ -1,13 +1,14 @@
 # # TODO
-# $$Get open CV window inside gui 
+# DONE Get open CV window inside gui 
 # experiment with packing to make gui resizable
 # get edge calc working
 # light/dark mode
-# tk sliders to ttk
 # Error catching for if camera is not detected
-#Label on livestream needs changing 
-# help button on sim needs moved 
-# truncate values for sliders
+
+# TODAY
+#DONE Label on livestream needs changing 
+#DONE help button on sim needs moved 
+#DONE Add new weights 
 
 
 from logging import currentframe
@@ -21,6 +22,7 @@ import time
 import cv2
 import numpy as np
 import math
+import threading
 
 
 # Imported for Images
@@ -115,8 +117,8 @@ ttk.Label(
 ##############################
 
 # True count incrementing Stystem
-trueCount = 0
 
+trueCount = 0
 
 def trueCountDown():
     global trueCount
@@ -183,8 +185,8 @@ def runEdgeCalc():
         #     decks.get(),
         # )
     )
-    T1.insert(0, "test")
-    T1.update()
+    # T1.insert(0, "test")
+    # T1.update()
 
 
 # CheckBoxes
@@ -245,8 +247,8 @@ helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsiteStrat).place(
     x=910, y=10
 )
 
-T1 = tk.Label(tab2, text="    ", borderwidth=2, relief="solid")
-T1.place(x=20, y=240)
+# T1 = tk.Label(tab2, text="    ", borderwidth=2, relief="solid")
+# T1.place(x=20, y=240)
 
 ###########################
 # 						  #
@@ -261,7 +263,7 @@ imageFrame = tk.Frame(tab3, width='600', height='500')
 imageFrame.grid(row=0, column=0, padx=10, pady=2)
 lmain = tk.Label(imageFrame)
 lmain.grid(row=0, column=0, columnspan=10)
-lmain.config(bd=1, relief=tk.SOLID)
+# lmain.config(bd=1, relief=tk.SOLID)
 running_Count = 0
 
 def updateRunningCount(running_Count):
@@ -272,7 +274,7 @@ def updateRunningCount(running_Count):
 def RunIR():
 
     global stopIR
-    camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(1)
 
     # Preparing variables for spatial dimensions of the frames
     h, w = None, None
@@ -446,7 +448,7 @@ def RunIR():
     cv2.destroyAllWindows()
 
 
-l1 = tk.Label(tab3, text="Running Count:")
+l1 = tk.Label(tab3, text="Current Card(s):")
 l2 = tk.Label(tab3, text="")
 l3 = tk.Label(tab3, text="Decks Remaining:")
 l4 = tk.Label(tab3, text="Current Bet:")
@@ -557,7 +559,7 @@ def demoDay():
 
     figure2.set_facecolor('xkcd:grey')
 
-    ax2.set_facecolor('xkcd:grey')
+    ax2.set_facecolor('xkcd:white')
 
     ax2.set_title("Time Vs. Bankroll")
 
@@ -584,7 +586,7 @@ label.place(x=20, y=10)
 
 # Question Mark button leads to help website
 helpButton = ttk.Button(tab4, image=helpPhoto, command=openWebsiteSim).place(
-    x=910, y=10
+    x=910, y=390
 )
 
 # CheckButtons
@@ -629,7 +631,7 @@ def riskOfRuin():
 
 def slider_changedRor(event):
     s2Label = ttk.Label(tab4, text=riskOfRuin())
-    s2Label.place(x=280, y=280)
+    s2Label.place(x=280, y=300)
     s2Label.configure(text=riskOfRuin())
 
 def bankroll():
@@ -641,23 +643,23 @@ def bankroll():
 
 def slider_changedBR(event):
     s1Label = ttk.Label(tab4, text=bankroll())
-    s1Label.place(x=280, y=230)
+    s1Label.place(x=280, y=250)
     s1Label.configure(text=bankroll())
     s1Label.update()
 
 
 # Sliders
 s1 = ttk.Scale(tab4, from_=0, to=47, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
-s1.place(x=170, y=230)
+s1.place(x=170, y=255)
 
 s2 = ttk.Scale(tab4, from_=0.5, to=0.999, orient="horizontal", command=slider_changedRor, variable=current_valueROR)
 # s2.set(0)
-s2.place(x=170, y=280)
+s2.place(x=170, y=305)
 
 
 s3 = ttk.Scale(tab4, from_=0, to=5000000, orient="horizontal")
 s3.set(0)
-s3.place(x=170, y=330)
+s3.place(x=170, y=355)
 
 # Slider Labels
 s1Label = ttk.Label(tab4, text="Starting Bankroll:").place(x=10, y=250)
@@ -674,13 +676,13 @@ def step():
     for i in range(11):
         root.update_idletasks()
         progress["value"] += 10
-        time.sleep(0.1)
+        time.sleep(0.05)
     progress["value"] = 0
     demoDay()
 
 
 # Run Button
-runButton = ttk.Button(tab4, text="Run", padding=15, command=step).place(x=575, y=330)
-
+runButton = ttk.Button(tab4, text="Run", padding=15, command=step)
+runButton.place(x=575, y=330)
 
 root.mainloop()
