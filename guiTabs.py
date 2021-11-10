@@ -15,7 +15,7 @@ from logging import currentframe
 import tkinter as tk
 from tkinter import Button, IntVar, StringVar, ttk
 from tkinter import font
-from tkinter.constants import ANCHOR, DISABLED, HORIZONTAL, RIDGE, S
+from tkinter.constants import ANCHOR, CENTER, DISABLED, HORIZONTAL, RIDGE, S
 from tkinter.font import Font, nametofont
 import webbrowser
 import time
@@ -40,6 +40,8 @@ from player import Player
 from dealer import Dealer
 from card import Card
 from hand import Hand
+
+from houseEdgeCalc.EdgeCalc import edgeCalc
 
 root = tk.Tk()
 
@@ -128,7 +130,8 @@ def trueCountDown():
         trueCount -= 1
         updateText = "True Count: " + str(trueCount)
         trueCountLabel.configure(text=updateText)
-        trueCountLabel.update()
+        trueCountLabel.update_idletasks()
+        runEdgeCalc()
 
 
 def trueCountUp():
@@ -136,7 +139,8 @@ def trueCountUp():
     trueCount += 1
     updateText = "True Count: " + str(trueCount)
     trueCountLabel.configure(text=updateText)
-    trueCountLabel.update()
+    trueCountLabel.update_idletasks()
+    runEdgeCalc()
 
 
 #####TODO CHANGE TO STRATEGY CHARTS SPECIFIC INFO PAGE
@@ -145,6 +149,16 @@ def openWebsiteStrat():
         "https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True
     )
 
+
+# def edgeCalc(
+#         insuranceTC,
+#         lateSurrenderTC,
+#         doubleAfterSplitTC,
+#         dealerStandTC,
+#         resplitAcesTC,
+#         basicStratDeviationsTC,
+#         decks):
+#     return trueCount
 
 ##
 ##CHART SIDE
@@ -173,20 +187,34 @@ trueCountLabel.place(x=475, y=150)
 ##
 ##EDGE CALC SIDE
 ##
+houseEdgeTag = ttk.Label(tab2, text="House Edge:", font=(default_font, 12))
+houseEdgeTag.place(x=20, y=280)
+houseEdgeLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 5, anchor=CENTER)
+houseEdgeLabel.place(x=180, y=280)
+
+
+stdDevTag = ttk.Label(tab2, text="Standard Deviation:", font=(default_font, 12))
+stdDevTag.place(x=20, y=315)
+stdDevLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 5, anchor= CENTER)
+stdDevLabel.place(x=180, y=315)
+
 def runEdgeCalc():
-    (
-        # edgeCalc(
-        #     insuranceTC.get(),
-        #     lateSurrenderTC.get(),
-        #     doubleAfterSplitTC.get(),
-        #     dealerStandTC.get(),
-        #     resplitAcesTC.get(),
-        #     basicStratDeviationsTC.get(),
-        #     decks.get(),
-        # )
+    houseText, stdDevText = edgeCalc(
+        insuranceTC.get(),
+        lateSurrenderTC.get(),
+        doubleAfterSplitTC.get(),
+        dealerStandTC.get(),
+        resplitAcesTC.get(),
+        basicStratDeviationsTC.get(),
+        decks.get(),
     )
-    # T1.insert(0, "test")
-    # T1.update()
+    
+    houseEdgeLabel.configure(text = houseText)
+    houseEdgeLabel.update_idletasks()
+    stdDevLabel.configure(text = stdDevText)
+    stdDevLabel.update_idletasks()
+
+    
 
 
 # CheckBoxes
@@ -201,10 +229,10 @@ decks = tk.IntVar()
 ttk.Label(tab2, text="Number of Decks:").place(x=150, y=10)
 
 # Radio Buttons
-ttk.Radiobutton(tab2, text="1", variable=decks, value=0).place(x=140, y=40)
-ttk.Radiobutton(tab2, text="2", variable=decks, value=1).place(x=180, y=40)
-ttk.Radiobutton(tab2, text="4", variable=decks, value=2).place(x=220, y=40)
-ttk.Radiobutton(tab2, text="6", variable=decks, value=4).place(x=270, y=40)
+ttk.Radiobutton(tab2, text="1", variable=decks, value=0, command=runEdgeCalc).place(x=140, y=40)
+ttk.Radiobutton(tab2, text="2", variable=decks, value=1, command=runEdgeCalc).place(x=180, y=40)
+ttk.Radiobutton(tab2, text="4", variable=decks, value=2, command=runEdgeCalc).place(x=220, y=40)
+ttk.Radiobutton(tab2, text="6", variable=decks, value=4, command=runEdgeCalc).place(x=270, y=40)
 
 # Check Buttons
 tc1 = ttk.Checkbutton(
@@ -232,9 +260,14 @@ tc4 = ttk.Checkbutton(
     variable=dealerStandTC,
     onvalue=1,
     offvalue=0,
+    command=runEdgeCalc
 ).place(x=20, y=150)
 tc5 = ttk.Checkbutton(
-    tab2, text="Resplit aces", variable=resplitAcesTC, onvalue=1, offvalue=0
+    tab2, text="Resplit aces", 
+    variable=resplitAcesTC, 
+    onvalue=1,
+    offvalue=0,
+    command=runEdgeCalc
 ).place(x=20, y=180)
 tc6 = ttk.Checkbutton(
     tab2,
@@ -242,7 +275,9 @@ tc6 = ttk.Checkbutton(
     variable=basicStratDeviationsTC,
     onvalue=1,
     offvalue=0,
+    command=runEdgeCalc
 ).place(x=20, y=210)
+
 helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsiteStrat).place(
     x=910, y=10
 )
@@ -261,14 +296,14 @@ stopIR = 0
 imageFrame = tk.Frame(tab3, width='600', height='500')
 
 imageFrame.grid(row=0, column=0, padx=10, pady=2)
-lmain = tk.Label(imageFrame)
+lmain = ttk.Label(imageFrame)
 lmain.grid(row=0, column=0, columnspan=10)
 # lmain.config(bd=1, relief=tk.SOLID)
 running_Count = 0
 
 def updateRunningCount(running_Count):
     l2.configure(text=running_Count)
-    l2.update
+    l2.update_idletasks()
 
 
 def RunIR():
@@ -440,7 +475,7 @@ def RunIR():
         im = Image.fromarray(cv2image)
         imgtk = ImageTk.PhotoImage(image=im)
         lmain.configure(image=imgtk)
-        lmain.update()
+        lmain.update_idletasks()
 
     # Releasing camera
     camera.release()
@@ -645,7 +680,7 @@ def slider_changedBR(event):
     s1Label = ttk.Label(tab4, text=bankroll())
     s1Label.place(x=280, y=250)
     s1Label.configure(text=bankroll())
-    s1Label.update()
+    s1Label.update_idletasks()
 
 
 # Sliders
