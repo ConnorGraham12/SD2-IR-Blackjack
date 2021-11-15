@@ -1,5 +1,5 @@
-from hand import Hand
-import basic_strategy
+from Resources.simulator.hand import Hand
+import Resources.simulator.basic_strategy
 
 class BetExceedsStackSize(ValueError):
     pass

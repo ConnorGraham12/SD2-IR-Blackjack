@@ -1,8 +1,8 @@
 
-from player import Player
-from blackjack_hi_low import Table
-from hand import Hand
-from card import Card
+from Resources.simulator.player import Player
+from Resources.simulator.blackjack_hi_low import Table
+from Resources.simulator.hand import Hand
+from Resources.simulator.card import Card
 
 
 player1 = Player(69, 3000, 50)

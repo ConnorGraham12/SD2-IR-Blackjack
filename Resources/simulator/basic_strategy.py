@@ -1,4 +1,4 @@
-from actions import Actions
+from Resources.simulator.actions import Actions
 
 # ONLY USES STAND, HIT, DOUBLE, SPLIT
 

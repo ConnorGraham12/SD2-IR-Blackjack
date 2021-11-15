@@ -1,13 +1,13 @@
-from shoe import Shoe
-from hand import Hand
-from card import Card
-from player import Player
-from dealer import Dealer
+from Resources.simulator.shoe import Shoe
+from Resources.simulator.hand import Hand
+from Resources.simulator.card import Card
+from Resources.simulator.player import Player
+from Resources.simulator.dealer import Dealer
 from math import floor
 import matplotlib
 import numpy
-import basic_strategy as bs
-import count_map as cm
+import Resources.simulator.basic_strategy as bs
+import Resources.simulator.count_map as cm
 
 MIN_NUM_BETTING_UNITS_ALLOWED = 4
 MAX_NUM_OF_SPLITS_ALLOWED = 4
@@ -401,4 +401,4 @@ class Table:
         if action == 'STAND':
             return
 
-        raise GameLogicError('This error should never be reached. If it is, then oopsies...')
+        # raise GameLogicError('This error should never be reached. If it is, then oopsies...')

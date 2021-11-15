@@ -1,4 +1,4 @@
-from card import Card
+from Resources.simulator.card import Card
 from random import randrange
 
 class InvalidDeckNumber(ValueError):

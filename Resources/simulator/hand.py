@@ -1,4 +1,4 @@
-from card import Card
+from Resources.simulator.card import Card
 
 class GameLogicError(Exception):
     pass

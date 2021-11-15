@@ -40,7 +40,7 @@ namespace eval ttk::theme::forest-dark {
             -insertwidth 1 \
             -insertcolor $colors(-fg) \
             -fieldbackground $colors(-selectbg) \
-            -font {TkDefaultFont 10} \
+            -font {TkDefaultFont 15} \
             -borderwidth 1 \
             -relief flat
 
@@ -504,7 +504,7 @@ namespace eval ttk::theme::forest-dark {
             [list $I(tab-basic) \
                 selected $I(tab-accent) \
                 active $I(tab-hover) \
-            ] -border 5 -padding {14 4}
+            ] -border 12 -padding {14 10}
 
         # Treeview
         ttk::style element create Treeview.field image $I(card) \
