@@ -1,14 +1,6 @@
 # # TODO
-# Welcome:
-#   Help button 
-# Strat:
-#   Bubble chart/ matrix (longer in width and height)--Maybe matplotliob?
-#  Live:
-#   Replicate side bar of browser game
-#   	-Cards in hard
-#   	-Suggesstion
-#   		-Hit, stand double
-#   insurance 
+
+#   insurance thing under chart
 #   True count
 #   Expected value
 #   Running Count
@@ -20,15 +12,15 @@
 #   bankroll go to 10mil
 #   Rounds played label
 
-#   Buttons
-#   Add player
-#   Add table
-#   clear all 
+
+# Adjust ticks to 1000
+# Sqrt 10mil
+# True count from -10 to 10
+# Impliment chart
 
 
-
-
-from logging import currentframe
+# IMPORTS
+# region
 import tkinter as tk
 from tkinter import Button, IntVar, StringVar, ttk
 from tkinter import font
@@ -40,15 +32,25 @@ import cv2
 import numpy as np
 import math
 import threading
-
+import tkinter.scrolledtext as ScrolledText
+from Resources.houseEdgeCalc.chart import HardTable,SoftTable,SplitTable
 
 # Imported for Images
 from PIL import ImageTk, Image
+from numpy.random.mtrand import random
 
 # For mathlib charts
 from pandas import DataFrame
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# IR Imports
+import torch 
+from torch.autograd import Variable
+from Resources.cardDetection.darknet import Darknet
+import random
+from Resources.cardDetection.util import *
+
 
 ##############
 # DEMO ONLY IMPORTS
@@ -57,9 +59,11 @@ from Resources.simulator.player import Player
 from Resources.simulator.dealer import Dealer
 from Resources.simulator.card import Card
 from Resources.simulator.hand import Hand
-
 from Resources.houseEdgeCalc.EdgeCalc import edgeCalc
+# endregion
 
+# ROOT TK ITEMS
+# region
 root = tk.Tk()
 
 # Window Name
@@ -110,6 +114,9 @@ tabControl.add(tab4, text="Simulator")
 
 # Packing all tabs
 tabControl.pack(expand=1, fill="both", anchor="center")
+
+
+# endregion
 
 ###########################
 # 						  #
@@ -178,6 +185,20 @@ def openWebsiteStrat():
 ##CHART SIDE
 ##
 
+graphFrame = tk.Frame(tab2)
+hardFrame = tk.Frame(graphFrame)
+softFrame = tk.Frame(graphFrame)
+splitframe = tk.Frame(graphFrame)
+
+t = HardTable(hardFrame)
+t2 = SoftTable(softFrame)
+t3 = SplitTable(splitframe)
+
+hardFrame.pack()
+softFrame.pack()
+splitframe.pack()
+
+graphFrame.place(x = 900, y = 20)
 
 
 # Up Increment
@@ -199,18 +220,22 @@ trueCountLabel.place(x=475, y=150)
 ##
 ##EDGE CALC SIDE
 ##
-houseEdgeTag = ttk.Label(tab2, text="House Edge:", font=(default_font, 17))
+houseEdgeTag = ttk.Label(tab2, text="Player Edge:", font=(default_font, 17))
 houseEdgeTag.place(x=20, y=340)
 stdDevTag = ttk.Label(tab2, text="Standard Deviation:", font=(default_font, 17))
 stdDevTag.place(x=20, y=375)
 
 
-houseEdgeLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 6, anchor=CENTER, font=(default_font, 17))
-houseEdgeLabel.place(x=230, y=340)
-stdDevLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 6, anchor= CENTER, font=(default_font, 17))
+playerEdgeLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+playerEdgeLabel.place(x=230, y=340)
+stdDevLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 8, anchor= CENTER, font=(default_font, 17))
 stdDevLabel.place(x=230, y=375)
 
+
+
+
 def runEdgeCalc():
+    global trueCount
     houseText, stdDevText = edgeCalc(
         insuranceTC.get(),
         lateSurrenderTC.get(),
@@ -221,12 +246,12 @@ def runEdgeCalc():
         decks.get(),
     )
     
-    houseEdgeLabel.configure(text = houseText)
-    houseEdgeLabel.update_idletasks()
+    playerEdge = str('{: .3f}'.format(1 - float(houseText) + (0.5) * trueCount) + "%")
+
+    playerEdgeLabel.configure(text = playerEdge)
+    playerEdgeLabel.update_idletasks()
     stdDevLabel.configure(text = stdDevText)
     stdDevLabel.update_idletasks()
-
-    
 
 
 # CheckBoxes
@@ -299,21 +324,6 @@ helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsiteStrat).place(
 )
 
 
-tree = ttk.Treeview(tab2)
-tree.place(x=1180, y=200)
-# Inserted at the root, program chooses id:
-tree.insert('', 'end', 'widgets', text='Widget Tour')
- 
-# Same thing, but inserted as first child:
-tree.insert('', 0, 'gallery', text='Applications')
-
-# Treeview chooses the id:
-id = tree.insert('', 'end', text='Tutorial')
-
-# Inserted underneath an existing node:
-tree.insert('widgets', 'end', text='Canvas')
-tree.insert(id, 'end', text='Tree')
-
 ###########################
 # 						  #
 #   Livefeed components   #
@@ -346,196 +356,132 @@ loadingBar = ttk.Progressbar(
         length=280
     )
 
-    
+
+def prep_image(img, inp_dim):
+
+    orig_im = img
+    dim = orig_im.shape[1], orig_im.shape[0]
+    img = cv2.resize(orig_im, (inp_dim, inp_dim))
+    img_ = img[:,:,::-1].transpose((2,0,1)).copy()
+    img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
+    return img_, orig_im, dim
+
+count = 0
+
+def write(x, img, classes, colors):
+    global count, st
+    c1 = tuple(x[1:3].int())
+    c1 = int(c1[0]), int(c1[1])
+    c2 = tuple(x[3:5].int())
+    c2 = int(c2[0]), int(c2[1])
+    cls = int(x[-1])
+    label = "{0}".format(classes[cls])
+    if count == 90:
+        msg = 'Card Seen: ' + label + '\n'
+        st.insert('end', msg)
+        st.update_idletasks()
+        st.yview(tk.END)
+        
+        count == 0
+    else:
+        count += 1
+
+
+    color = random.choice(colors)
+    cv2.rectangle(img, c1, c2,(255,0,0), 1)
+    t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
+    c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
+    cv2.rectangle(img, c1, c2,(0,0,0), -1)
+    cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
+    return img
+
 
 def RunIR():
-
-    global stopIR, loadingBar
     
-    camera = cv2.VideoCapture(0)
+    
+    cfgfile = "Resources/cardDetection/train.cfg"
+    weightsfile = "Resources/cardDetection/card_chip.weights"
+    num_classes = 18
 
-    # Preparing variables for spatial dimensions of the frames
-    h, w = None, None
-    # h, w = 1000, 500
+    confidence = 0.5
+    nms_thesh = 0.3
+    start = 0
+    CUDA = torch.cuda.is_available()
+    
 
-    with open("Resources/cardDetection/classes.names") as f:
-        # Getting labels reading every line
-        # and putting them into the list
-        labels = [line.strip() for line in f]
+    
+    
+    bbox_attrs = 5 + num_classes
+    
+    model = Darknet(cfgfile)
+    model.load_weights(weightsfile)
+    
+    model.net_info["height"] = 640
+    inp_dim = int(model.net_info["height"])
+    
+    assert inp_dim % 32 == 0 
+    assert inp_dim > 32
 
-    network = cv2.dnn.readNetFromDarknet(
-        "Resources/cardDetection/train.cfg", "Resources/cardDetection/card_chip.weights"
-    )
-
-    network.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-    network.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-
-    # Getting list with names of all layers from YOLO v3 network
-    layers_names_all = network.getLayerNames()
-
-
-    layers_names_output = [
-        layers_names_all[i[0] - 1] for i in network.getUnconnectedOutLayers()
-    ]
-
-    # Setting minimum probability to eliminate weak predictions
-    probability_minimum = 0.5
-
-    threshold = 0.3
-
-    colours = np.random.randint(0, 255, size=(len(labels), 3), dtype="uint8")
-
-    # gives pairs of cards
-    def pairs(results):
-        cards = []
-        for i, (N, X, Y) in enumerate(results):
-            dist = 1000000000
-            best_index = i
-            for j, (n, x, y) in enumerate(results):
-                cur_dist = abs(X - x) + abs(Y - y)
-                if i != j:
-                    if cur_dist < dist:
-                        dist = cur_dist
-                        best_index = j
-            cards.append((best_index))
-
-        return (
-            {
-                str(sorted((i, j))): (results[i][0], results[j][0])
-                for i, j in enumerate(cards)
-                if cards[j] == i
-            }
-        ).values()
-
-    # Defining loop for catching frames
-    loadingBar.stop()
-    loadingBar.destroy()
+    if CUDA:
+        model.cuda()
+            
+    model.eval()
+    
+    cap = cv2.VideoCapture(0)
+    
+    assert cap.isOpened(), 'Cannot capture source'
+    
+    frames = 0
+    start = time.time()  
+    loadingBar.destroy()  
     while stopIR == 0:
         
+        ret, frame = cap.read()
+    
         
-        # Capturing frame-by-frame from camera
-        _, frame = camera.read()
-
-
-        if w is None or h is None:
-            # Slicing from tuple only first two elements
-            try:
-                h, w = frame.shape[:2]
-            except:
-                 tk.messagebox.showerror('Camera Error', 'Error: Make sure your camera is connected!')
-
-        blob = cv2.dnn.blobFromImage(
-            frame, 1 / 255.0, (416, 416), swapRB=True, crop=False
-        )
-
-
-        network.setInput(blob)  
-        start = time.time()
-        output_from_network = network.forward(layers_names_output)
-        end = time.time()
-
-
-        bounding_boxes = []
-        confidences = []
-        class_numbers = []
+        img, orig_im, dim = prep_image(frame, inp_dim)
         
-        # Going through all output layers after feed forward pass
-        for result in output_from_network:
-            # Going through all detections from current output layer
-            for detected_objects in result:
-                # Getting 80 classes' probabilities for current detected object
-                scores = detected_objects[5:]
-                # Getting index of the class with the maximum value of probability
-                class_current = np.argmax(scores)
-                # Getting value of probability for defined class
-                confidence_current = scores[class_current]
-
-                # Eliminating weak predictions with minimum probability
-                if confidence_current > probability_minimum:
-                    box_current = detected_objects[0:4] * np.array([w, h, w, h])
-                    x_center, y_center, box_width, box_height = box_current
-                    x_min = int(x_center - (box_width / 2))
-                    y_min = int(y_center - (box_height / 2))
-
-                    bounding_boxes.append(
-                        [x_min, y_min, int(box_width), int(box_height)]
-                    )
-                    confidences.append(float(confidence_current))
-                    class_numbers.append(class_current)
+        im_dim = torch.FloatTensor(dim).repeat(1,2)                        
         
-        results = cv2.dnn.NMSBoxes(
-            bounding_boxes, confidences, probability_minimum, threshold
-        )
-
-        send = []
         
-        if len(results) > 0:
-            # Going through indexes of results
-            for i in results.flatten():
+        if CUDA:
+            im_dim = im_dim.cuda()
+            img = img.cuda()
+      
+        output = model(Variable(img), CUDA)
+        output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
 
-                x_min, y_min = bounding_boxes[i][0], bounding_boxes[i][1]
-                box_width, box_height = bounding_boxes[i][2], bounding_boxes[i][3]
+        output[:,1:5] = torch.clamp(output[:,1:5], 0.0, float(inp_dim))/inp_dim
+        output[:,[1,3]] *= frame.shape[1]
+        output[:,[2,4]] *= frame.shape[0]
 
-                colour_box_current = colours[class_numbers[i]].tolist()
-
-                # Drawing bounding box on the original current frame
-                cv2.rectangle(
-                    frame,
-                    (x_min, y_min),
-                    (x_min + box_width, y_min + box_height),
-                    colour_box_current,
-                    2,
-                )
-
-                # Preparing text with label and confidence for current bounding box
-                text_box_current = "{}: {:.4f}".format(
-                    labels[int(class_numbers[i])], confidences[i]
-                )
-
-                # Putting text with label and confidence on the original image
-                cv2.putText(
-                    frame,
-                    text_box_current,
-                    (x_min, y_min - 5),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    colour_box_current,
-                    2,
-                )
-
-                x, y, width, heighth = bounding_boxes[i]
-                
-
-                print(
-                    "Location of",
-                    labels[int(class_numbers[i])],
-                    "=",
-                    x,
-                    y,
-                    "Confidence =",
-                    text_box_current[3:],
-                )
-
-                send.append((labels[int(class_numbers[i])], x, y))
-            print("The pairs are", pairs(send))
-            running_Count = labels[int(class_numbers[i])]
-            updateRunningCount(running_Count)
-            
         
-        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-        im = Image.fromarray(cv2image)
-        imgtk = ImageTk.PhotoImage(image=im.resize((1000, 588)))
-        lmain.configure(image=imgtk)
+        classes = load_classes('Resources/cardDetection/classes.names')
+        colors = np.random.randint(0, 255, size=(len(classes), 3), dtype='uint8')
+        
+        list(map(lambda x: write(x, orig_im, classes, colors), output))
+
+        im = cv2.cvtColor(orig_im, cv2.COLOR_BGR2RGBA)
+        im = Image.fromarray(im)
+        im = ImageTk.PhotoImage(image=im)
+        lmain.configure(image=im)
         lmain.update_idletasks()
-        
-        
-        
 
-    # Releasing camera
-    camera.release()
-    # Destroying all opened OpenCV windows
+    cap.release()
     cv2.destroyAllWindows()
-    lmain.configure(image=placeholdPhoto)
+    lmain.configure(image=placeholdPhoto)        
+
+
+
+
+    # global stopIR, loadingBar  
+        
+    #     # lmain.update_idletasks()
+    # # Releasing camera
+    # camera.release()
+    # # Destroying all opened OpenCV windows
+    # cv2.destroyAllWindows()
+    # lmain.configure(image=placeholdPhoto)
 
 
 l1 = tk.Label(tab3, text="Current Card(s):")
@@ -550,37 +496,84 @@ def startStream():
     loadingBar.place(x=380,y=410)
     loadingBar.start(10)
 
+    # Change Buttons
     startStream.place(x=2000, y=800)
-    endStream.place(x=975, y=650)
+    endStream.place(x=1275, y=600)
 
-    l1.place(x=675, y=50)
-    l2.place(x=880, y=50)
-
-    
-
+    # l1.place(x=1050, y=50)
+    # l2.place(x=880, y=50)
 
     # Start/Stop Variables
     global stopIR
-    global T1
     stopIR = 0
+
+    # Start thread for IR 
     T1 = threading.Thread(target=RunIR)
     T1.start()
-  
+    
 
 
 def endStream():
     global stopIR
+    global loadingBar
     stopIR = 1
-    
+    try:
+        loadingBar.stop()
+    except:
+        print("")
     lmain.update_idletasks()
     # Change Buttons
     endStream.place(x=2000, y=800)
-    startStream.place(x=2000, y=800)
+    startStream.place(x=1275, y=600)
 
 
-startStream = ttk.Button(tab3, text="Start Livefeed", padding=18, command=startStream)
+
+# MESSING WITH LOGGING
+
+
+# class TextHandler(logging.Handler):
+#     # This class allows you to log to a Tkinter Text or ScrolledText widget
+#     # Adapted from Moshe Kaplan: https://gist.github.com/moshekaplan/c425f861de7bbf28ef06
+
+#     def __init__(self, text):
+#         # run the regular Handler __init__
+#         logging.Handler.__init__(self)
+#         # Store a reference to the Text it will log to
+#         self.text = text
+
+#     def emit(self, record):
+#         msg = self.format(record)
+#         def append():
+#             self.text.configure(state='normal')
+#             self.text.insert(tk.END, msg + '\n')
+#             self.text.configure(state='disabled')
+#             # Autoscroll to the bottom
+#             self.text.yview(tk.END)
+#         # This is necessary because we can't modify the Text from other threads
+#         self.text.after(0, append)
+
+
+st = ScrolledText.ScrolledText(tab3, state='normal')
+
+st.configure(font=(default_font, 12),width=50, height = 28, bg='black', fg='white')
+
+st.place(x=1100,y=40)
+# st.insert()
+# text_handler = TextHandler(st)
+# st.insert('end', 'test')
+st.update_idletasks()
+# Logging configuration
+# logging.basicConfig(filename='test.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')        
+# Add the handler to logger
+# logger = logging.getLogger()        
+# logger.addHandler(text_handler)
+
+
+
+
+startStream = ttk.Button(tab3, text="Start Livefeed", padding=18, width = 17, command=startStream)
 startStream.place(x=1275, y=600)
-endStream = ttk.Button(tab3, text="End Livefeed", padding=15, command=endStream)
+endStream = ttk.Button(tab3, text="End Livefeed", padding=18,  width = 17,command=endStream)
 
 ##############################
 # 						     #
@@ -596,7 +589,7 @@ def openWebsiteSim():
 
 
 # MathPlotLibData
-# MathLib Testing Seciton
+
 bankrollvsTime = []
 def demoDay():
     
@@ -625,7 +618,7 @@ def demoDay():
     # try:
     bankroll_over_time = game.play_n_rounds(total_rounds_played, num_bins)
     # except:
-    #     demoDay()
+    #     
     #     return
         
         
@@ -648,13 +641,13 @@ def demoDay():
  
     # progress.stop()
     # MathPlotLib Graph
-    figure2 = plt.Figure(figsize=(9, 4), dpi=65)
+    figure2 = plt.Figure(figsize=(9, 4), dpi=85)
 
     ax2 = figure2.add_subplot(111)
 
     line2 = FigureCanvasTkAgg(figure2, tab4)
 
-    line2.get_tk_widget().place(x=350, y=25)
+    line2.get_tk_widget().place(x=650, y=25)
 
     # df2 = bankrollvsTime[["Rounds", "Bankroll"]].groupby("Time").sum()
 
@@ -669,11 +662,6 @@ def demoDay():
     progress.stop()
 
     # END DELETE
-
-
-
-
-
 
 # Rule Variatiions
 insurance = tk.IntVar()
@@ -723,36 +711,44 @@ ttk.Radiobutton(tab4, text="Flat Bet", variable=decks, value=1).place(x=130, y=6
 # current_value = 0.1
 current_valueROR = tk.DoubleVar(value = .1)
 current_valueBR = tk.IntVar(value = 0)
+current_valueRP = tk.IntVar(value = 0)
 
 #Functions for Risk of Ruin slider
+
 def riskOfRuin():
     # print(current_value.get())
     tmp = -math.log(current_valueROR.get(), 2)
     ror = math.exp(-2/tmp)
     return str('{: .3f}'.format(ror))
     
-
 def slider_changedRor(event):
-    s2Label = ttk.Label(tab4, text=riskOfRuin(), borderwidth=3, relief="solid", width = 6, anchor=CENTER, font=(default_font, 17))
+    s2Label = ttk.Label(tab4, text=riskOfRuin(), borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
     s2Label.place(x=355, y=555)
     s2Label.configure(text=riskOfRuin())
 
+# Functions for Bankroll slider
+
 def bankroll():
-    # print(current_valueBR.get())
     val = current_valueBR.get()
     tmp = math.pow(val, 4)
-    return str('{: .1f}'.format(tmp)) 
-
+    return str('{: .1f}'.format(tmp))
 
 def slider_changedBR(event):
-    s1Label = ttk.Label(tab4, text=bankroll(), borderwidth=3, relief="solid", width = 6, anchor=CENTER, font=(default_font, 17))
+    s1Label = ttk.Label(tab4, text=bankroll(), borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
     s1Label.place(x=355, y=505)
     s1Label.configure(text=bankroll())
     s1Label.update_idletasks()
 
-# tab2, text="0", borderwidth=3, relief="solid", width = 6, anchor=CENTER, font=(default_font, 17)
+# Function for rounds played slider
+
+def slider_changedRP(event):
+    s3Label = ttk.Label(tab4, text=current_valueRP, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+    s3Label.place(x=355, y=605)
+    s3Label.configure(text=current_valueRP.get())
+    s3Label.update_idletasks()
+
 # Sliders
-s1 = ttk.Scale(tab4, from_=0, to=47, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
+s1 = ttk.Scale(tab4, from_=0, to=47.2870805, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
 s1.set(0)
 s1.place(x=240, y=510)
 
@@ -760,7 +756,7 @@ s2 = ttk.Scale(tab4, from_=0.999, to=0.5, orient="horizontal", command=slider_ch
 s2.set(0.999)
 s2.place(x=240, y=560)
 
-s3 = ttk.Scale(tab4, from_=0, to=5000000, orient="horizontal")
+s3 = ttk.Scale(tab4, from_=0, to=5000000, orient="horizontal", command = slider_changedRP, variable = current_valueRP)
 s3.set(0)
 s3.place(x=240, y=610)
 
@@ -772,9 +768,9 @@ s3Label = ttk.Label(tab4, text="Rounds Played:").place(x=10, y=600)
 
 # Progress Bar
 progress = ttk.Progressbar(tab4, orient=HORIZONTAL, length=300, mode="indeterminate")
-progress.place(x=475, y=305)
+progress.place(x=870, y=380)
 
-# Step Fucntion to iterate loading bar 
+# Step Function to iterate loading bar 
 
 
 def runGraph():
@@ -785,6 +781,18 @@ def runGraph():
 
 # Run Button
 runButton = ttk.Button(tab4, text="Run", padding=15, command=runGraph)
-runButton.place(x=575, y=330)
+runButton.place(x=950, y=420)
+
+# Add player button
+add_player_button = ttk.Button(tab4, text="Add Player", padding=5)
+add_player_button.place(x=810, y=520)
+#   Add table button
+add_table_button = ttk.Button(tab4, text="Add Table", padding=5)
+add_table_button.place(x=960, y=520)
+#   clear all button
+clear_all_button = ttk.Button(tab4, text="Clear", padding=5)
+clear_all_button.place(x=1110, y=520)
+
+
 
 root.mainloop()
