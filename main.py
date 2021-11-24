@@ -15,14 +15,14 @@
 
 # Adjust ticks to 1000
 # Sqrt 10mil
-# True count from -10 to 10
-# Impliment chart
+
+
 
 
 # IMPORTS
 # region
 import tkinter as tk
-from tkinter import Button, IntVar, StringVar, ttk
+from tkinter import Button, IntVar, Spinbox, StringVar, ttk
 from tkinter import font
 from tkinter.constants import ANCHOR, BOTH, CENTER, DISABLED, HORIZONTAL, RIDGE, S, VERTICAL, Y
 from tkinter.font import Font, nametofont
@@ -152,26 +152,47 @@ ttk.Label(
 # True count incrementing Stystem
 
 trueCount = 0
+# Label GEts updated by TCUp  and TCDown
+global trueCountLabel
+trueCountLabel = ttk.Label(tab2, text="True Count: 0")
+
+trueCountLabel.place(x=475, y=150)
+
+# def updateText():
+#     global trueCount
+#     updateText = "True Count: " + str(trueCount)
+#     return updateText
 
 def trueCountDown():
-    global trueCount
-    if trueCount <= 0:
+    global trueCount, trueCountLabel
+    
+    if trueCount <= -10:
         pass
     else:
+        if trueCount == 0:
+            trueCountLabel = ttk.Label(tab2, text="True Count: 0")
+            trueCountLabel.place(x=475, y=150)
         trueCount -= 1
         updateText = "True Count: " + str(trueCount)
         trueCountLabel.configure(text=updateText)
         trueCountLabel.update_idletasks()
+        
         runEdgeCalc()
 
 
 def trueCountUp():
-    global trueCount
-    trueCount += 1
-    updateText = "True Count: " + str(trueCount)
-    trueCountLabel.configure(text=updateText)
-    trueCountLabel.update_idletasks()
-    runEdgeCalc()
+    global trueCount, trueCountLabel
+    if trueCount >= 10:
+        pass
+    else:
+        if trueCount == 0:
+            trueCountLabel = ttk.Label(tab2, text="True Count: 0")
+            trueCountLabel.place(x=475, y=150)
+        trueCount += 1
+        updateText = "True Count: " + str(trueCount)
+        trueCountLabel.configure(text=updateText)
+        trueCountLabel.update_idletasks()
+        runEdgeCalc()
 
 
 #####TODO CHANGE TO STRATEGY CHARTS SPECIFIC INFO PAGE
@@ -198,7 +219,7 @@ hardFrame.pack()
 softFrame.pack()
 splitframe.pack()
 
-graphFrame.place(x = 900, y = 20)
+graphFrame.place(x = 1000, y = 20)
 
 
 # Up Increment
@@ -213,9 +234,7 @@ downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place
     x=500, y=200
 )
 
-# Label GEts updated by TCUp  and TCDown
-trueCountLabel = ttk.Label(tab2, text="True Count: 0")
-trueCountLabel.place(x=475, y=150)
+
 
 ##
 ##EDGE CALC SIDE
@@ -334,11 +353,11 @@ stopIR = 0
 
 imageFrame = tk.Frame(tab3, width='1000', height='500')
 
-placeholderImage = Image.open("Resources/images/webcamPlacehold.png")
-placeholdPhoto = ImageTk.PhotoImage(placeholderImage.resize((1000, 500), Image.ANTIALIAS))
+placeholderImage = Image.open("Resources/images/webcamPlacehold2.png")
+placeholdPhoto = ImageTk.PhotoImage(placeholderImage.resize((600, 500), Image.ANTIALIAS))
 
 
-imageFrame.place(x=20, y = 50)
+imageFrame.place(x=50, y = 50)
 lmain = ttk.Label(imageFrame, borderwidth=2 , relief="solid")
 lmain.grid(row=0, column=0, columnspan=15)
 lmain.configure(image=placeholdPhoto)
@@ -473,17 +492,6 @@ def RunIR():
 
 
 
-
-    # global stopIR, loadingBar  
-        
-    #     # lmain.update_idletasks()
-    # # Releasing camera
-    # camera.release()
-    # # Destroying all opened OpenCV windows
-    # cv2.destroyAllWindows()
-    # lmain.configure(image=placeholdPhoto)
-
-
 l1 = tk.Label(tab3, text="Current Card(s):")
 l2 = tk.Label(tab3, text="")
 l3 = tk.Label(tab3, text="Decks Remaining:")
@@ -527,53 +535,26 @@ def endStream():
     startStream.place(x=1275, y=600)
 
 
-
-# MESSING WITH LOGGING
-
-
-# class TextHandler(logging.Handler):
-#     # This class allows you to log to a Tkinter Text or ScrolledText widget
-#     # Adapted from Moshe Kaplan: https://gist.github.com/moshekaplan/c425f861de7bbf28ef06
-
-#     def __init__(self, text):
-#         # run the regular Handler __init__
-#         logging.Handler.__init__(self)
-#         # Store a reference to the Text it will log to
-#         self.text = text
-
-#     def emit(self, record):
-#         msg = self.format(record)
-#         def append():
-#             self.text.configure(state='normal')
-#             self.text.insert(tk.END, msg + '\n')
-#             self.text.configure(state='disabled')
-#             # Autoscroll to the bottom
-#             self.text.yview(tk.END)
-#         # This is necessary because we can't modify the Text from other threads
-#         self.text.after(0, append)
-
-
 st = ScrolledText.ScrolledText(tab3, state='normal')
 
-st.configure(font=(default_font, 12),width=50, height = 28, bg='black', fg='white')
-
-st.place(x=1100,y=40)
-# st.insert()
-# text_handler = TextHandler(st)
-# st.insert('end', 'test')
+st.configure(font=(default_font, 12),width=75, height = 28, bg='black', fg='white')
+st.place(x=800,y=40)
 st.update_idletasks()
-# Logging configuration
-# logging.basicConfig(filename='test.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')        
-# Add the handler to logger
-# logger = logging.getLogger()        
-# logger.addHandler(text_handler)
 
-
+playerBox = ttk.Spinbox(tab3, from_=1,to = 3, width=8, wrap='true', justify=CENTER, takefocus='false', exportselection = 'true')
+playerBox.place(x=975, y=600)
 
 
 startStream = ttk.Button(tab3, text="Start Livefeed", padding=18, width = 17, command=startStream)
 startStream.place(x=1275, y=600)
 endStream = ttk.Button(tab3, text="End Livefeed", padding=18,  width = 17,command=endStream)
+
+trueCountLabel = ttk.Label(tab3, text="True Count:").place(x=10, y=600)
+runningCountLabel = ttk.Label(tab3, text="Running Count:").place(x=10, y=650)
+trueCountLabelBox = ttk.Label(tab3, text=0, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+trueCountLabelBox.place(x=200, y=610)
+runningCountLabelBox = ttk.Label(tab3, text=0, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+runningCountLabelBox.place(x=200, y=660)
 
 ##############################
 # 						     #
@@ -625,12 +606,7 @@ def demoDay():
 
 
     rounds = np.linspace(0, total_rounds_played, retstep=True, num=num_bins, dtype=int, axis=0)
-    # print("bak_roll = " + str((bankroll_over_time)))
-    # print("rounds[0]_len = " + str((rounds[0])))
-    # plt.scatter(rounds[0], bankroll_over_time)
-    # plt.xlabel("rounds")
-    # plt.ylabel("bankroll")
-    # plt.show(block=True)
+  
     
     global bankrollvsTime
 
