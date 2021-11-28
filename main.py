@@ -497,9 +497,6 @@ def startStream():
     startStream.place(x=2000, y=800)
     endStream.place(x=1275, y=600)
 
-    # l1.place(x=1050, y=50)
-    # l2.place(x=880, y=50)
-
     # Start/Stop Variables
     global stopIR
     stopIR = 0
@@ -510,10 +507,10 @@ def startStream():
     
 def RunIR():
     detector = IR()
-    # print("STARTING WITH: " + str(playerIR))
-    loadingBar.destroy() 
+    loadingBar.destroy()
+    print("Starting with number" + str(playerIR.get()))
     while stopIR == 0:
-        ret = detector(int(playerIR))
+        ret = detector(playerIR.get())
         if not ret:
             continue
         hands, img = ret
@@ -553,14 +550,18 @@ st.configure(font=(default_font, 12),width=75, height = 28, bg='black', fg='whit
 st.place(x=800,y=40)
 st.update_idletasks()
 
-playerIR = 2
+playerIR = tk.IntVar(tab3, 2)
+# playerIR.set(tab3, 2)
 ttk.Label(tab3, text="Number of players", font=(default_font, 15)).place(x=950, y = 600)
 # Radio buttons return one more then label say to compensate for dealer 
 t1 = ttk.Radiobutton(tab3, text="1", variable=playerIR, value=2,)
+t2 = ttk.Radiobutton(tab3, text="2", variable=playerIR, value=3,)
+t3 = ttk.Radiobutton(tab3, text="3", variable=playerIR, value=4,)
+
 t1.place(x=950, y=620)
-ttk.Radiobutton(tab3, text="2", variable=playerIR, value=3,).place(x=990, y=620)
-ttk.Radiobutton(tab3, text="3", variable=playerIR, value=4,).place(x=1030, y=620)
-t1.invoke()
+t2.place(x=990, y=620)
+t3.place(x=1030, y=620)
+# t1.invoke()
 
 
 
