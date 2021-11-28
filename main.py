@@ -557,7 +557,7 @@ t1 = ttk.Radiobutton(tab3, text="1", variable=playerIR, value=2,)
 t1.place(x=950, y=620)
 ttk.Radiobutton(tab3, text="2", variable=playerIR, value=3,).place(x=990, y=620)
 ttk.Radiobutton(tab3, text="3", variable=playerIR, value=4,).place(x=1030, y=620)
-t1.select()
+t1.invoke()
 
 
 
@@ -685,13 +685,7 @@ c4 = ttk.Checkbutton(
 c5 = ttk.Checkbutton(
     tab4, text="Resplit aces", variable=resplitAces, onvalue=1, offvalue=0
 ).place(x=20, y=200)
-c6 = ttk.Checkbutton(
-    tab4,
-    text="Basic Startegy Deviations",
-    variable=basicStratDeviations,
-    onvalue=1,
-    offvalue=0,
-).place(x=20, y=240)
+
 
 #Kelly Bets Radio
 ttk.Radiobutton(tab4, text="Kelly Bet", variable=decks, value=0).place(x=20, y=650)
