@@ -18,10 +18,10 @@ class Chart:
 
     def __init__(self, root, dict):
         if dict =="stand":
-            print("STAND")
+            # print("STAND")
             hit_17 = get_bs_stand_soft_17()
         if dict == "hit":
-            print("HIT")
+            # print("HIT")
             hit_17 = get_bs_hit_soft_17()
         hard_hands = hit_17['hard']
         soft_hands = hit_17['soft']
