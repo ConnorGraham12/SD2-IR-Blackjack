@@ -21,7 +21,6 @@
 
 # IMPORTS
 # region
-from _typeshed import NoneType
 import tkinter as tk
 from tkinter import Button, IntVar, Spinbox, StringVar, ttk
 from tkinter import font
