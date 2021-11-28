@@ -461,6 +461,7 @@ def RunIR():
                 continue
             if len(player_hands) > 1 and dealer_upcard != '':
                 print(hands)
+                print(player)
                 action = table.get_player_action(player, i)
                 all_actions.append(action)
     
