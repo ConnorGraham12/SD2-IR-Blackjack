@@ -58,7 +58,7 @@ from Resources.cardDetection.GPUir import IR
 # IR Hand Suggestion imports 
 
 from Resources.cardDetection.sim2.table import TableIR
-from Resources.cardDetection.sim2.player import Player
+from Resources.cardDetection.sim2.player import PlayerIR
 from Resources.cardDetection.sim2.rule_set import RuleSet
 from Resources.cardDetection.sim2.hand import Hand
 from Resources.cardDetection.sim2.card import Card
@@ -420,7 +420,7 @@ def RunIR():
 
     rules = RuleSet(8, 0.75, 10, 1000)
     table = TableIR(0, rules)
-    player = Player(0, 5000000)
+    player = PlayerIR(0, 5000000)
     table.add_player(0, player) 
 
     table.rules.hit_split_aces = True
@@ -453,14 +453,14 @@ def RunIR():
 
 
 
-        dealermsg = (f"dealer upcard is: {dealer_upcard}")
+        dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
         st.insert('end', dealermsg)
         all_actions = []
         for i in range(len(player_hands)):
             action = table.get_player_action(player, i)
             all_actions.append(action)
         
-        msg = str(all_actions)
+        msg = (str(all_actions) + "\n")
         st.insert('end', msg)
         st.update_idletasks()
         st.yview(tk.END)

@@ -3,9 +3,9 @@ import Resources.cardDetection.sim2.basic_strategy as bs
 from Resources.cardDetection.sim2.shoe import Shoe
 from Resources.cardDetection.sim2.hand import Hand
 from Resources.cardDetection.sim2.card import Card
-from Resources.cardDetection.sim2.player import Player
-from Resources.cardDetection.sim2.dealer import Dealer
+from Resources.cardDetection.sim2.player import PlayerIR
 from Resources.cardDetection.sim2.rule_set import RuleSet
+from Resources.cardDetection.sim2.dealer import Dealer
 from math import floor
 
 class GameLogicError(Exception):
@@ -67,16 +67,16 @@ class TableIR:
 
     # Should rewrite to default to just appending to the list
     # if index is not specified, and throw an error if len is > 7
-    def add_player(self, seat_index: int, player: Player):
+    def add_player(self, seat_index: int, player: PlayerIR):
         """Overwrites a player to the seat index"""
-        if isinstance(self.player_list[seat_index], Player):
+        if isinstance(self.player_list[seat_index], PlayerIR):
             raise IndexError(f"A player is already sitting at index {seat_index}!")
 
         self.player_list[seat_index] = player
 
     def remove_player(self, seat_index: int):
         """Removes player the list of players at the given index"""
-        if not isinstance(self.player_list[seat_index], Player):
+        if not isinstance(self.player_list[seat_index], PlayerIR):
             raise IndexError(f"There is no player at index {seat_index} to remove.")
         self.player_list[seat_index] = None
 
@@ -91,7 +91,7 @@ class TableIR:
         self.running_count += self.count_map[curr_card.card_face]
         self.true_count = floor(self.running_count / self.shoe.get_decks_left())
 
-        if isinstance(player_or_dealer_object, Player):
+        if isinstance(player_or_dealer_object, PlayerIR):
             if which_hand is None:
                 player_or_dealer_object.receive_card(curr_card)
             else:
@@ -125,7 +125,7 @@ class TableIR:
                     self.deal_card(player)
             self.deal_card(self.dealer)
 
-    def add_to_bankrupt_players(self, bankrupt_player: Player):
+    def add_to_bankrupt_players(self, bankrupt_player: PlayerIR):
         """Removes player from table and adds them to the bankrupt players list"""
         self.bankrupt_players.append(bankrupt_player)
 
@@ -175,7 +175,7 @@ class TableIR:
         return
 
     # Assumes you are able to double
-    def double(self, player: Player, hand_index=None):
+    def double(self, player: PlayerIR, hand_index=None):
         """
         Simulates a player who doubles.
         Hand_index defaults to the first hand unless specified
@@ -193,7 +193,7 @@ class TableIR:
         return
 
     # Assumes you are able to split
-    def split(self, player: Player, hand_index=None):
+    def split(self, player: PlayerIR, hand_index=None):
         """
         Splits hand at index into 2 new hands, and deals a card to each.
         Also takes another bet from the player
@@ -208,7 +208,7 @@ class TableIR:
     # Assumes you are able to
     # Players can only surrender their first hand.
     # Players cannot surrender after a split
-    def surrender(self, player: Player):
+    def surrender(self, player: PlayerIR):
         """Simulates a player who surrenders. Does not give any money."""
         player.surrendered = True
         return

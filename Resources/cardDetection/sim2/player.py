@@ -22,7 +22,7 @@ class HandNotFound(Exception):
 class CannotSplitHand(Exception):
     pass
 
-class Player():
+class PlayerIR():
     def __init__(self,
             _id: int,
             stack_size: int,
@@ -74,7 +74,7 @@ class Player():
         return f"<{str(self)}>"
 
     def __eq__(self, other):
-        if isinstance(other, Player):
+        if isinstance(other, PlayerIR):
             return self._id == other._id
         return False
 
