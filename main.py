@@ -57,7 +57,7 @@ from Resources.cardDetection.util import *
 from Resources.cardDetection.GPUir import IR
 # IR Hand Suggestion imports 
 
-from Resources.cardDetection.sim2.table import Table
+from Resources.cardDetection.sim2.table import TableIR
 from Resources.cardDetection.sim2.player import Player
 from Resources.cardDetection.sim2.rule_set import RuleSet
 from Resources.cardDetection.sim2.hand import Hand
@@ -419,7 +419,7 @@ def RunIR():
     previousHand = []
 
     rules = RuleSet(8, 0.75, 10, 1000)
-    table = Table(0, rules)
+    table = TableIR(0, rules)
     player = Player(0, 5000000)
     table.add_player(0, player) 
 

@@ -11,7 +11,7 @@ from math import floor
 class GameLogicError(Exception):
     pass
 
-class Table:
+class TableIR:
     def __init__(self, _id: int, rules: RuleSet):
         self._id = _id
         self.shoe = Shoe(rules.num_decks, rules.penetration)
