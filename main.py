@@ -490,7 +490,7 @@ l5 = tk.Label(tab3, text="Reset page")
 
 def startStream():
     global loadingBar
-    loadingBar.place(x=380,y=410)
+    loadingBar.place(x=220,y=450)
     loadingBar.start(10)
 
     # Change Buttons
@@ -510,7 +510,8 @@ def startStream():
     
 def RunIR():
     detector = IR()
-    print("STARTING WITH: " + str(playerIR))
+    # print("STARTING WITH: " + str(playerIR))
+    loadingBar.destroy() 
     while stopIR == 0:
         ret = detector(int(playerIR))
         if not ret:
@@ -525,6 +526,8 @@ def RunIR():
         st.insert('end', msg)
         st.update_idletasks()
         st.yview(tk.END)
+    cv2.destroyAllWindows()
+    lmain.configure(image=placeholdPhoto) 
 
 
 
