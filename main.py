@@ -33,7 +33,9 @@ import numpy as np
 import math
 import threading
 import tkinter.scrolledtext as ScrolledText
-from Resources.houseEdgeCalc.chart import HardTable,SoftTable,SplitTable
+from Resources.houseEdgeCalc.chart import Chart
+# from Resources.houseEdgeCalc.chart import HardTable,SoftTable,SplitTable
+from Resources.houseEdgeCalc.test2 import get_bs_stand_soft_17, get_bs_hit_soft_17
 
 # Imported for Images
 from PIL import ImageTk, Image
@@ -201,19 +203,11 @@ def trueCountUp():
 ##
 
 graphFrame = tk.Frame(tab2)
-hardFrame = tk.Frame(graphFrame)
-softFrame = tk.Frame(graphFrame)
-splitframe = tk.Frame(graphFrame)
+t = Chart(graphFrame, 'hit')
 
-t = HardTable(hardFrame)
-t2 = SoftTable(softFrame)
-t3 = SplitTable(splitframe)
 
-hardFrame.pack()
-softFrame.pack()
-splitframe.pack()
 
-graphFrame.place(x = 1000, y = 20)
+graphFrame.place(x = 1050, y = 20)
 
 
 # Up Increment
@@ -234,21 +228,21 @@ downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place
 ##EDGE CALC SIDE
 ##
 houseEdgeTag = ttk.Label(tab2, text="Player Edge:", font=(default_font, 17))
-houseEdgeTag.place(x=20, y=340)
+houseEdgeTag.place(x=10, y=600)
 stdDevTag = ttk.Label(tab2, text="Standard Deviation:", font=(default_font, 17))
-stdDevTag.place(x=20, y=375)
+stdDevTag.place(x=10, y=650)
 
 
 playerEdgeLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
-playerEdgeLabel.place(x=230, y=340)
+playerEdgeLabel.place(x=240, y=600)
 stdDevLabel = ttk.Label(tab2, text="0", borderwidth=3, relief="solid", width = 8, anchor= CENTER, font=(default_font, 17))
-stdDevLabel.place(x=230, y=375)
+stdDevLabel.place(x=240, y=650)
 
 
 
 
 def runEdgeCalc():
-    global trueCount
+    global trueCount, graphFrame
     houseText, stdDevText = edgeCalc(
         insuranceTC.get(),
         lateSurrenderTC.get(),
@@ -265,6 +259,16 @@ def runEdgeCalc():
     playerEdgeLabel.update_idletasks()
     stdDevLabel.configure(text = stdDevText)
     stdDevLabel.update_idletasks()
+
+    graphFrame.destroy()
+    if dealerStandTC.get() == 1:
+        graphFrame = tk.Frame(tab2)
+        t = Chart(graphFrame, 'hit')
+        graphFrame.place(x = 1050, y = 20)
+    else:
+        graphFrame = tk.Frame(tab2)
+        t = Chart(graphFrame, 'stand')
+        graphFrame.place(x = 1050, y = 20)
 
 
 # CheckBoxes
@@ -369,118 +373,6 @@ loadingBar = ttk.Progressbar(
         length=280
     )
 
-
-# def prep_image(img, inp_dim):
-
-#     orig_im = img
-#     dim = orig_im.shape[1], orig_im.shape[0]
-#     img = cv2.resize(orig_im, (inp_dim, inp_dim))
-#     img_ = img[:,:,::-1].transpose((2,0,1)).copy()
-#     img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
-#     return img_, orig_im, dim
-
-# count = 0
-
-# def write(x, img, classes, colors):
-#     global count, st
-#     c1 = tuple(x[1:3].int())
-#     c1 = int(c1[0]), int(c1[1])
-#     c2 = tuple(x[3:5].int())
-#     c2 = int(c2[0]), int(c2[1])
-#     cls = int(x[-1])
-#     label = "{0}".format(classes[cls])
-#     if count == 90:
-#         msg = 'Card Seen: ' + label + '\n'
-#         st.insert('end', msg)
-#         st.update_idletasks()
-#         st.yview(tk.END)
-        
-#         count == 0
-#     else:
-#         count += 1
-
-
-#     color = random.choice(colors)
-#     cv2.rectangle(img, c1, c2,(255,0,0), 1)
-#     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
-#     c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
-#     cv2.rectangle(img, c1, c2,(0,0,0), -1)
-#     cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
-#     return img
-
-
-
-
-
-# def RunIR():
-    
-    
-#     cfgfile = "Resources/cardDetection/train.cfg"
-#     weightsfile = "Resources/cardDetection/card_chip.weights"
-#     num_classes = 18
-
-#     confidence = 0.5
-#     nms_thesh = 0.3
-#     start = 0
-#     CUDA = torch.cuda.is_available()
-    
-#     bbox_attrs = 5 + num_classes
-    
-#     model = Darknet(cfgfile)
-#     model.load_weights(weightsfile)
-    
-#     model.net_info["height"] = 640
-#     inp_dim = int(model.net_info["height"])
-    
-#     assert inp_dim % 32 == 0 
-#     assert inp_dim > 32
-
-#     if CUDA:
-#         model.cuda()
-            
-#     model.eval()
-    
-#     cap = cv2.VideoCapture(0)
-    
-#     assert cap.isOpened(), 'Cannot capture source'
-    
-#     frames = 0
-#     start = time.time()  
-#     loadingBar.destroy()  
-#     while stopIR == 0:
-        
-#         ret, frame = cap.read()
-    
-        
-#         img, orig_im, dim = prep_image(frame, inp_dim)
-        
-#         im_dim = torch.FloatTensor(dim).repeat(1,2)                        
-        
-        
-#         if CUDA:
-#             im_dim = im_dim.cuda()
-#             img = img.cuda()
-      
-#         output = model(Variable(img), CUDA)
-#         output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
-
-#         output[:,1:5] = torch.clamp(output[:,1:5], 0.0, float(inp_dim))/inp_dim
-#         output[:,[1,3]] *= frame.shape[1]
-#         output[:,[2,4]] *= frame.shape[0]
-
-        
-#         classes = load_classes('Resources/cardDetection/classes.names')
-#         colors = np.random.randint(0, 255, size=(len(classes), 3), dtype='uint8')
-        
-#         list(map(lambda x: write(x, orig_im, classes, colors), output))
-
-
-#     cap.release()
-#     cv2.destroyAllWindows()
-#     lmain.configure(image=placeholdPhoto)        
-
-
-
 l1 = tk.Label(tab3, text="Current Card(s):")
 l2 = tk.Label(tab3, text="")
 l3 = tk.Label(tab3, text="Decks Remaining:")
@@ -505,10 +397,12 @@ def startStream():
     T1 = threading.Thread(target=RunIR)
     T1.start()
     
+
+
 def RunIR():
     detector = IR()
     loadingBar.destroy()
-    print("Starting with number" + str(playerIR.get()))
+    # print("Starting with number" + str(playerIR.get()))
     while stopIR == 0:
         ret = detector(playerIR.get())
         if not ret:
@@ -611,22 +505,11 @@ def demoDay():
     player_list[0].take_seat(0, game)
 
 
-    # ONLY WORKS WHEN 1 PLAYER IS SITTING AND MUST BE IN SEAT INDEX ZERO!!!
-    # (hotfix for demo)
-    # try:
     bankroll_over_time = game.play_n_rounds(total_rounds_played, num_bins)
-    # except:
-    #     
-    #     return
         
-        
-
-
     rounds = np.linspace(0, total_rounds_played, retstep=True, num=num_bins, dtype=int, axis=0)
-  
     
     global bankrollvsTime
-
 
     bankrollvsTime = DataFrame(data = np.column_stack((rounds[0],bankroll_over_time)), columns=['Rounds', 'Bankroll']).groupby("Rounds").sum()
 
@@ -773,9 +656,11 @@ runButton.place(x=950, y=420)
 # Add player button
 add_player_button = ttk.Button(tab4, text="Add Player", padding=5)
 add_player_button.place(x=810, y=520)
+
 #   Add table button
 add_table_button = ttk.Button(tab4, text="Add Table", padding=5)
 add_table_button.place(x=960, y=520)
+
 #   clear all button
 clear_all_button = ttk.Button(tab4, text="Clear", padding=5)
 clear_all_button.place(x=1110, y=520)

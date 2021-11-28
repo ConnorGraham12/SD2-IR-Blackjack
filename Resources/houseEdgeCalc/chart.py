@@ -1,17 +1,8 @@
-# from os import closerange
-# from typing import ItemsView
-# import numpy as np
-# import pandas as pd
 import tkinter as tk
 from Resources.houseEdgeCalc.test2 import get_bs_stand_soft_17, get_bs_hit_soft_17
+# hit_17_dict = get_bs_hit_soft_17()
 
 
-# hit_17_dict = get_bs_stand_soft_17()
-hit_17_dict = get_bs_hit_soft_17()
-
-hard_hands = hit_17_dict['hard']
-soft_hands = hit_17_dict['soft']
-pair_hands = hit_17_dict['pair']
 
 
 
@@ -23,163 +14,186 @@ iterate3 = [('2', '2'),('2', '3'),('2', '4'),('2', '5'),('2', '6'),('2', '7'),('
 from tkinter import *
   
 storageArray = [None] * 300
+class Chart:
 
-class HardTable:
+    def __init__(self, root, dict):
+        if dict =="stand":
+            print("STAND")
+            hit_17 = get_bs_stand_soft_17()
+        if dict == "hit":
+            print("HIT")
+            hit_17 = get_bs_hit_soft_17()
+        hard_hands = hit_17['hard']
+        soft_hands = hit_17['soft']
+        pair_hands = hit_17['pair']
+        hardFrame = tk.Frame(root)
+        softFrame = tk.Frame(root)
+        splitframe = tk.Frame(root)
 
-    def __init__(self,root):
 
-        item = 0
-        count = 0
-        for y in range(15):
-            for x in range(14):
-                
-                temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
+        Chart.HardTable(hardFrame, hard_hands)
+        Chart.SoftTable(softFrame, soft_hands)
+        Chart.SplitTable(splitframe, pair_hands)
+        hardFrame.pack()
+        softFrame.pack()
+        splitframe.pack()
+    
+    class HardTable:
 
-                if(y == 0):
+        def __init__(self,root,hard_hands):
 
-                    msg = ['HARD','2','3','4','5','6','7','8','9','10','J', 'Q','K','A','X',"X"]
-                    temp.insert('end', str(msg[x]))
-                    temp.configure(bg = '#707070') 
-                    if(x==0):
-                        temp.configure(width=6)
+            item = 0
+            count = 0
+            for y in range(15):
+                for x in range(14):
                     
-                elif (x == 0 and y > 0):
-                    msg = ['4','5','6','7','8','9','10','11', '12','13','14','15','16', '17+']
-                    temp.insert('end', str(msg[y-1]))
-                    temp.configure(bg = '#707070', width=6)   
+                    temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
 
-                else:
-                    tmp = hard_hands[iterate[item]] 
-                    if((str(tmp)) == "['HIT']"):
-                        temp.insert('end', 'H')
-                        temp.configure(bg = 'red')
+                    if(y == 0):
+
+                        msg = ['HARD','2','3','4','5','6','7','8','9','10','J', 'Q','K','A','X',"X"]
+                        temp.insert('end', str(msg[x]))
+                        temp.configure(bg = '#707070') 
+                        if(x==0):
+                            temp.configure(width=6)
                         
-                    elif((str(tmp)) == "['STAND']"):
-                        temp.insert('end', 'S')
-                        temp.configure(bg = 'yellow')
-                    elif((str(tmp)) == "['DOUBLE', 'HIT']"):
-                        temp.insert('end', 'Dh')
-                        temp.configure(bg = 'blue')
-                    elif((str(tmp)) == "['SURRENDER', 'HIT']"):
-                        temp.insert('end', 'Rh')
-                        temp.configure(bg = 'white')
-                    elif((str(tmp)) == "['SURRENDER', 'STAND']"):
-                        temp.insert('end', 'Rs')
-                        temp.configure(bg = 'white')
-                    
+                    elif (x == 0 and y > 0):
+                        msg = ['4','5','6','7','8','9','10','11', '12','13','14','15','16', '17+']
+                        temp.insert('end', str(msg[y-1]))
+                        temp.configure(bg = '#707070', width=6)   
+
+                    else:
+                        tmp = hard_hands[iterate[item]] 
+                        if((str(tmp)) == "['HIT']"):
+                            temp.insert('end', 'H')
+                            temp.configure(bg = 'red')
+                            
+                        elif((str(tmp)) == "['STAND']"):
+                            temp.insert('end', 'S')
+                            temp.configure(bg = 'yellow')
+                        elif((str(tmp)) == "['DOUBLE', 'HIT']"):
+                            temp.insert('end', 'Dh')
+                            temp.configure(bg = 'blue')
+                        elif((str(tmp)) == "['SURRENDER', 'HIT']"):
+                            temp.insert('end', 'Rh')
+                            temp.configure(bg = 'white')
+                        elif((str(tmp)) == "['SURRENDER', 'STAND']"):
+                            temp.insert('end', 'Rs')
+                            temp.configure(bg = 'white')
                         
-                    item += 1
-                storageArray[count] = temp 
-                count += 1  
-                temp.grid(row=y, column=x)    
-class SoftTable:
+                            
+                        item += 1
+                    storageArray[count] = temp 
+                    count += 1  
+                    temp.grid(row=y, column=x)    
+    class SoftTable:
 
-    def __init__(self,root):
+        def __init__(self,root,soft_hands):
 
-        item = 0
-        count = 0
-        for y in range(9):
-            for x in range(14):
-                
-                temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
-
-                if(y == 0):
-
-                    msg = ['SOFT','2','3','4','5','6','7','8','9','10','J', 'Q','K','A','X',"X"]
-                    temp.insert('end', str(msg[x]))
-                    temp.configure(bg = '#707070')
-                    if(x==0):
-                        temp.configure(width=6) 
+            item = 0
+            count = 0
+            for y in range(9):
+                for x in range(14):
                     
-                elif (x == 0 and y > 0):
-                    msg = ['13','14','15','16', '17', '18', '19', '20+']
-                    temp.insert('end', str(msg[y-1]))
-                    temp.configure(bg = '#707070', width=6)   
+                    temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
 
-                else:
-                    tmp = soft_hands[iterate2[item]]
-                    
-                    if((str(tmp)) == "['HIT']"):
-                        temp.insert('end', 'H')
-                        temp.configure(bg = 'red')
+                    if(y == 0):
+
+                        msg = ['SOFT','2','3','4','5','6','7','8','9','10','J', 'Q','K','A','X',"X"]
+                        temp.insert('end', str(msg[x]))
+                        temp.configure(bg = '#707070')
+                        if(x==0):
+                            temp.configure(width=6) 
                         
-                    elif((str(tmp)) == "['STAND']"):
-                        temp.insert('end', 'S')
-                        temp.configure(bg = 'yellow')
-                    elif((str(tmp)) == "['DOUBLE', 'HIT']"):
-                        temp.insert('end', 'Dh')
-                        temp.configure(bg = 'blue')
-                    elif((str(tmp)) == "['SURRENDER', 'HIT']"):
-                        temp.insert('end', 'Rh')
-                        temp.configure(bg = 'white')
-                    elif((str(tmp)) == "['DOUBLE', 'STAND']"):
-                        temp.insert('end', 'Ds')
-                        temp.configure(bg = '#00ffff')
-                       
-                    
-                    item += 1
-                storageArray[count] = temp 
-                count += 1  
-                temp.grid(row=y, column=x)    
-class SplitTable:
+                    elif (x == 0 and y > 0):
+                        msg = ['13','14','15','16', '17', '18', '19', '20+']
+                        temp.insert('end', str(msg[y-1]))
+                        temp.configure(bg = '#707070', width=6)   
 
-    def __init__(self,root):
-
-        item = 0
-        count = 0
-        for y in range(11):
-            for x in range(14):
-                
-                temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow", takefocus='false')
-
-                if(y == 0):
-
-                    msg = ['SPLIT','2','3','4','5','6','7','8','9','10','J', 'Q','K','A','X',"X"]
-                    temp.insert('end', str(msg[x]))
-                    temp.configure(bg = '#707070')
-                    if(x==0):
-                        temp.configure(width=6)
-                    
-                elif (x == 0 and y > 0):
-                    msg = ['2,2','3,3','4,4','5,5','6,6', '7,7', '8,8', '9,9','10,10', 'A,A']
-                    temp.insert('end', str(msg[y-1]))
-                    temp.configure(bg = '#707070', width=6)   
-
-                else:
-                    tmp = pair_hands[iterate3[item]]
-                    if((str(tmp)) == "['HIT']"):
-                        temp.insert('end', 'H')
-                        temp.configure(bg = 'red')
+                    else:
+                        tmp = soft_hands[iterate2[item]]
                         
-                    elif((str(tmp)) == "['STAND']"):
-                        temp.insert('end', 'S')
-                        temp.configure(bg = 'yellow')
-                    elif((str(tmp)) == "['DOUBLE', 'HIT']"):
-                        temp.insert('end', 'Dh')
-                        temp.configure(bg = 'blue')
-                    elif((str(tmp)) == "['SURRENDER', 'HIT']"):
-                        temp.insert('end', 'Rh')
-                        temp.configure(bg = 'white')
-                    elif((str(tmp)) == "['DOUBLE', 'STAND']"):
-                        temp.insert('end', 'Ds')
-                        temp.configure(bg = '#00ffff')
-                    elif((str(tmp)) == "['SPLIT_DAS', 'HIT']"):
-                        temp.insert('end', 'Ph')
-                        temp.configure(bg = '#add8e6')
-                    elif((str(tmp)) == "['SPLIT']"):
-                        temp.insert('end', 'P')
-                        temp.configure(bg = '#3EB489') 
-                    elif((str(tmp)) == "['SPLIT', 'HIT']"):
-                        temp.insert('end', 'S/H')
-                        temp.configure(bg = '#ffb6c1') 
-                    elif((str(tmp)) == "['SURRENDER', 'SPLIT']"):
-                        temp.insert('end', 'Rs')
-                        temp.configure(bg = '#76b5c5') 
-                    # print(str(tmp))    
-                    item = item + 1
-                storageArray[count] = temp 
-                count += 1  
-                temp.grid(row=y, column=x)  
+                        if((str(tmp)) == "['HIT']"):
+                            temp.insert('end', 'H')
+                            temp.configure(bg = 'red')
+                            
+                        elif((str(tmp)) == "['STAND']"):
+                            temp.insert('end', 'S')
+                            temp.configure(bg = 'yellow')
+                        elif((str(tmp)) == "['DOUBLE', 'HIT']"):
+                            temp.insert('end', 'Dh')
+                            temp.configure(bg = 'blue')
+                        elif((str(tmp)) == "['SURRENDER', 'HIT']"):
+                            temp.insert('end', 'Rh')
+                            temp.configure(bg = 'white')
+                        elif((str(tmp)) == "['DOUBLE', 'STAND']"):
+                            temp.insert('end', 'Ds')
+                            temp.configure(bg = '#00ffff')
+                        
+                        
+                        item += 1
+                    storageArray[count] = temp 
+                    count += 1  
+                    temp.grid(row=y, column=x)    
+    class SplitTable:
+
+        def __init__(self,root,pair_hands):
+
+            item = 0
+            count = 0
+            for y in range(11):
+                for x in range(14):
+                    
+                    temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow", takefocus='false')
+
+                    if(y == 0):
+
+                        msg = ['SPLIT','2','3','4','5','6','7','8','9','10','J', 'Q','K','A','X',"X"]
+                        temp.insert('end', str(msg[x]))
+                        temp.configure(bg = '#707070')
+                        if(x==0):
+                            temp.configure(width=6)
+                        
+                    elif (x == 0 and y > 0):
+                        msg = ['2,2','3,3','4,4','5,5','6,6', '7,7', '8,8', '9,9','10,10', 'A,A']
+                        temp.insert('end', str(msg[y-1]))
+                        temp.configure(bg = '#707070', width=6)   
+
+                    else:
+                        tmp = pair_hands[iterate3[item]]
+                        if((str(tmp)) == "['HIT']"):
+                            temp.insert('end', 'H')
+                            temp.configure(bg = 'red')
+                            
+                        elif((str(tmp)) == "['STAND']"):
+                            temp.insert('end', 'S')
+                            temp.configure(bg = 'yellow')
+                        elif((str(tmp)) == "['DOUBLE', 'HIT']"):
+                            temp.insert('end', 'Dh')
+                            temp.configure(bg = 'blue')
+                        elif((str(tmp)) == "['SURRENDER', 'HIT']"):
+                            temp.insert('end', 'Rh')
+                            temp.configure(bg = 'white')
+                        elif((str(tmp)) == "['DOUBLE', 'STAND']"):
+                            temp.insert('end', 'Ds')
+                            temp.configure(bg = '#00ffff')
+                        elif((str(tmp)) == "['SPLIT_DAS', 'HIT']"):
+                            temp.insert('end', 'Ph')
+                            temp.configure(bg = '#add8e6')
+                        elif((str(tmp)) == "['SPLIT']"):
+                            temp.insert('end', 'P')
+                            temp.configure(bg = '#3EB489') 
+                        elif((str(tmp)) == "['SPLIT', 'HIT']"):
+                            temp.insert('end', 'S/H')
+                            temp.configure(bg = '#ffb6c1') 
+                        elif((str(tmp)) == "['SURRENDER', 'SPLIT']"):
+                            temp.insert('end', 'Rs')
+                            temp.configure(bg = '#76b5c5') 
+                        # print(str(tmp))    
+                        item = item + 1
+                    storageArray[count] = temp 
+                    count += 1  
+                    temp.grid(row=y, column=x)  
 
 # root = Tk()
 # graphFrame = tk.Frame(root)
