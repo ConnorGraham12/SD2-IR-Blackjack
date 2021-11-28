@@ -98,31 +98,30 @@ class Hand:
     #           'push'
     def get_hand_result(self, dealer_hand):
 
-        dealer_hand_value_tuple = dealer_hand.get_hand_value()
-
-        if dealer_hand_value_tuple == ('pair', 'A'):
-            raise GameLogicError('Dealer was suppose to hit on a soft 12 (pair of aces)')
-
-        dealer_hand_value = int(dealer_hand_value_tuple[1])
-
-        if dealer_hand_value < 17:
-            raise GameLogicError(f"Dealer was suppose to hit on {dealer_hand_value}")
-
-        # get_hand_value() can return ('pair', 'A')
-        # The only time get_hand_result is called with a pair of Aces
-        # is after you split an Ace and get another Ace
-        # If we get to this point, we can no longer resplit the ace or hit again,
-        # Therefore, the hand value is a 12 (11 + 1)
-        if self.get_hand_value() == ('pair', 'A'):
-            player_hand_value = 12
-
-        else:
-            player_hand_value = int((self.get_hand_value())[1])
-
         if self.is_blackjack():
             if dealer_hand.is_blackjack():
                 return 'push'
             return 'blackjack'
+
+        dealer_hand_value_tuple = dealer_hand.get_hand_value()
+
+        if dealer_hand_value_tuple == ('pair', 'A'): # dealing with soft 12s
+            raise GameLogicError('Dealer was suppose to hit on a soft 12 (pair of aces)')
+
+        dealer_hand_value = int(dealer_hand_value_tuple[1])
+
+        if dealer_hand.is_pair():
+            dealer_hand_value = 2*dealer_hand_value
+
+        if dealer_hand_value < 17:
+            raise GameLogicError(f"Dealer was suppose to hit on {dealer_hand_value}")
+
+        if self.get_hand_value() == ('pair', 'A'): # dealing with soft 12s
+            player_hand_value = 12
+        else:
+            player_hand_value = int(self.get_hand_value()[1])
+            if self.is_pair():
+                player_hand_value = 2*player_hand_value # pairs return single card's value
 
         if player_hand_value > 21:
             return 'lose'

@@ -101,6 +101,7 @@ def write(x, img):
     c2 = tuple(x[3:5].int())
     c2 = int(c2[0]), int(c2[1])
     cls = int(x[-1])
+    # print("CLS: "+str(cls))
     label = "{0}".format(classes[cls])
     color = random.choice(colors)
     cv2.rectangle(img, c1, c2,(255,0,0), 1)

@@ -510,8 +510,9 @@ def startStream():
     
 def RunIR():
     detector = IR()
+    print("STARTING WITH: " + str(playerIR))
     while stopIR == 0:
-        ret = detector(1)
+        ret = detector(int(playerIR))
         if not ret:
             continue
         hands, img = ret
@@ -520,12 +521,10 @@ def RunIR():
         im = ImageTk.PhotoImage(image=im)
         lmain.configure(image=im)
         lmain.update_idletasks()
-
-
-                # if hands:
-		#     print(hands)
-
-		# cv2.imshow("frame", img)
+        msg = ("Hands seen: " + str(hands) + '\n')
+        st.insert('end', msg)
+        st.update_idletasks()
+        st.yview(tk.END)
 
 
 
@@ -551,13 +550,14 @@ st.configure(font=(default_font, 12),width=75, height = 28, bg='black', fg='whit
 st.place(x=800,y=40)
 st.update_idletasks()
 
-playerIR = tk.IntVar()
+playerIR = 2
 ttk.Label(tab3, text="Number of players", font=(default_font, 15)).place(x=950, y = 600)
 # Radio buttons return one more then label say to compensate for dealer 
-ttk.Radiobutton(tab3, text="1", variable=playerIR, value=2,).place(x=950, y=620)
+t1 = ttk.Radiobutton(tab3, text="1", variable=playerIR, value=2,)
+t1.place(x=950, y=620)
 ttk.Radiobutton(tab3, text="2", variable=playerIR, value=3,).place(x=990, y=620)
 ttk.Radiobutton(tab3, text="3", variable=playerIR, value=4,).place(x=1030, y=620)
-
+t1.select()
 
 
 
