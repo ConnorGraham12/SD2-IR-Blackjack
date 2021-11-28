@@ -33,6 +33,8 @@ import numpy as np
 import math
 import threading
 import tkinter.scrolledtext as ScrolledText
+
+from pandas.core import frame
 from Resources.houseEdgeCalc.chart import Chart
 # from Resources.houseEdgeCalc.chart import HardTable,SoftTable,SplitTable
 from Resources.houseEdgeCalc.test2 import get_bs_stand_soft_17, get_bs_hit_soft_17
@@ -53,6 +55,13 @@ from Resources.cardDetection.darknet import Darknet
 import random
 from Resources.cardDetection.util import *
 from Resources.cardDetection.GPUir import IR
+# IR Hand Suggestion imports 
+
+from Resources.cardDetection.sim2.table import Table
+from Resources.cardDetection.sim2.player import Player
+from Resources.cardDetection.sim2.rule_set import RuleSet
+from Resources.cardDetection.sim2.hand import Hand
+from Resources.cardDetection.sim2.card import Card
 
 
 ##############
@@ -403,6 +412,22 @@ def RunIR():
     detector = IR()
     loadingBar.destroy()
     # print("Starting with number" + str(playerIR.get()))
+    
+    # Frame counter for running count
+    framecount = 0
+    currentHand = []
+    previousHand = []
+
+    rules = RuleSet(8, 0.75, 10, 1000)
+    table = Table(0, rules)
+    player = Player(0, 5000000)
+    table.add_player(0, player) 
+
+    table.rules.hit_split_aces = True
+    table.rules.resplit_aces = True
+    dealer_upcard = ''
+    player_hands = []
+
     while stopIR == 0:
         ret = detector(playerIR.get())
         if not ret:
@@ -413,7 +438,29 @@ def RunIR():
         im = ImageTk.PhotoImage(image=im)
         lmain.configure(image=im)
         lmain.update_idletasks()
-        msg = ("Hands seen: " + str(hands) + '\n')
+        
+        if framecount % 20 == 0:
+            hands
+        for hand in hands:
+            if len(hand) == 1: # dealer hand, only 1 card
+                dealer_upcard = hand[0]
+                continue
+            # otherwise player hand
+            this_hand = []
+            for card in hand:
+                this_hand.append(Card(card, 's'))
+            player_hands.append(Hand(this_hand))
+
+
+
+        dealermsg = (f"dealer upcard is: {dealer_upcard}")
+        st.insert('end', dealermsg)
+        all_actions = []
+        for i in range(len(player_hands)):
+            action = table.get_player_action(player, i)
+            all_actions.append(action)
+        
+        msg = str(all_actions)
         st.insert('end', msg)
         st.update_idletasks()
         st.yview(tk.END)

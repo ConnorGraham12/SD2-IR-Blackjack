@@ -1,11 +1,11 @@
-import count_map as cm
-import basic_strategy as bs
-from shoe import Shoe
-from hand import Hand
-from card import Card
-from player import Player
-from dealer import Dealer
-from rule_set import RuleSet
+import Resources.cardDetection.sim2.count_map as cm
+import Resources.cardDetection.sim2.basic_strategy as bs
+from Resources.cardDetection.sim2.shoe import Shoe
+from Resources.cardDetection.sim2.hand import Hand
+from Resources.cardDetection.sim2.card import Card
+from Resources.cardDetection.sim2.player import Player
+from Resources.cardDetection.sim2.dealer import Dealer
+from Resources.cardDetection.sim2.rule_set import RuleSet
 from math import floor
 
 class GameLogicError(Exception):
