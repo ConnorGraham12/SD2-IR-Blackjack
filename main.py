@@ -459,7 +459,8 @@ def RunIR():
         for i in range(len(player_hands)):
             if player == None:
                 continue
-            if len(player_hands) > 1 and dealer_upcard != '': 
+            if len(player_hands) > 1 and dealer_upcard != '':
+                print(hands)
                 action = table.get_player_action(player, i)
                 all_actions.append(action)
     
