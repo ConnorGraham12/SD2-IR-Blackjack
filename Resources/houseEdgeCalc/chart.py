@@ -130,7 +130,7 @@ class SplitTable:
         for y in range(11):
             for x in range(14):
                 
-                temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
+                temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow", takefocus='false')
 
                 if(y == 0):
 

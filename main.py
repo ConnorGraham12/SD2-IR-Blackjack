@@ -50,6 +50,7 @@ from torch.autograd import Variable
 from Resources.cardDetection.darknet import Darknet
 import random
 from Resources.cardDetection.util import *
+from Resources.cardDetection.GPUir import IR
 
 
 ##############
@@ -115,6 +116,12 @@ tabControl.add(tab4, text="Simulator")
 # Packing all tabs
 tabControl.pack(expand=1, fill="both", anchor="center")
 
+def openWebsite():
+    webbrowser.open(
+        "https://sd2blackjack.herokuapp.com/", new=0, autoraise=True
+    )
+
+
 
 # endregion
 
@@ -123,18 +130,14 @@ tabControl.pack(expand=1, fill="both", anchor="center")
 # Welcome page components #
 # 						  #
 ###########################
-# TODO change to welcome site 
-def openWebsiteWelcome():
-    webbrowser.open(
-        "https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True
-    )
+
 
 # Logo
 image1 = Image.open("Resources/images/blackjackLogo.png")
 photo1 = ImageTk.PhotoImage(image1.resize((490, 412), Image.ANTIALIAS))
 imgLabel1 = ttk.Label(tab1, image=photo1).place(x=540, y=80)
 
-ttk.Button(tab1, text = "Learn more about the app!",command = openWebsiteWelcome, padding=15).place(x=680, y=630)
+ttk.Button(tab1, text = "Learn more about the app!",command = openWebsite, padding=15).place(x=660, y=630)
 
 # Lables
 ttk.Label(tab1, text="The ultimate card counting trainer.",font=(default_font, 26)).place(x=525, y=505)
@@ -158,10 +161,6 @@ trueCountLabel = ttk.Label(tab2, text="True Count: 0")
 
 trueCountLabel.place(x=475, y=150)
 
-# def updateText():
-#     global trueCount
-#     updateText = "True Count: " + str(trueCount)
-#     return updateText
 
 def trueCountDown():
     global trueCount, trueCountLabel
@@ -195,11 +194,6 @@ def trueCountUp():
         runEdgeCalc()
 
 
-#####TODO CHANGE TO STRATEGY CHARTS SPECIFIC INFO PAGE
-def openWebsiteStrat():
-    webbrowser.open(
-        "https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True
-    )
 
 
 ##
@@ -338,7 +332,7 @@ tc6 = ttk.Checkbutton(
     command=runEdgeCalc
 ).place(x=20, y=280)
 
-helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsiteStrat).place(
+helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsite).place(
     x=1480, y=10
 )
 
@@ -376,119 +370,114 @@ loadingBar = ttk.Progressbar(
     )
 
 
-def prep_image(img, inp_dim):
+# def prep_image(img, inp_dim):
 
-    orig_im = img
-    dim = orig_im.shape[1], orig_im.shape[0]
-    img = cv2.resize(orig_im, (inp_dim, inp_dim))
-    img_ = img[:,:,::-1].transpose((2,0,1)).copy()
-    img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
-    return img_, orig_im, dim
+#     orig_im = img
+#     dim = orig_im.shape[1], orig_im.shape[0]
+#     img = cv2.resize(orig_im, (inp_dim, inp_dim))
+#     img_ = img[:,:,::-1].transpose((2,0,1)).copy()
+#     img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
+#     return img_, orig_im, dim
 
-count = 0
+# count = 0
 
-def write(x, img, classes, colors):
-    global count, st
-    c1 = tuple(x[1:3].int())
-    c1 = int(c1[0]), int(c1[1])
-    c2 = tuple(x[3:5].int())
-    c2 = int(c2[0]), int(c2[1])
-    cls = int(x[-1])
-    label = "{0}".format(classes[cls])
-    if count == 90:
-        msg = 'Card Seen: ' + label + '\n'
-        st.insert('end', msg)
-        st.update_idletasks()
-        st.yview(tk.END)
+# def write(x, img, classes, colors):
+#     global count, st
+#     c1 = tuple(x[1:3].int())
+#     c1 = int(c1[0]), int(c1[1])
+#     c2 = tuple(x[3:5].int())
+#     c2 = int(c2[0]), int(c2[1])
+#     cls = int(x[-1])
+#     label = "{0}".format(classes[cls])
+#     if count == 90:
+#         msg = 'Card Seen: ' + label + '\n'
+#         st.insert('end', msg)
+#         st.update_idletasks()
+#         st.yview(tk.END)
         
-        count == 0
-    else:
-        count += 1
+#         count == 0
+#     else:
+#         count += 1
 
 
-    color = random.choice(colors)
-    cv2.rectangle(img, c1, c2,(255,0,0), 1)
-    t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
-    c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
-    cv2.rectangle(img, c1, c2,(0,0,0), -1)
-    cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
-    return img
+#     color = random.choice(colors)
+#     cv2.rectangle(img, c1, c2,(255,0,0), 1)
+#     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
+#     c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
+#     cv2.rectangle(img, c1, c2,(0,0,0), -1)
+#     cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
+#     return img
 
 
-def RunIR():
-    
-    
-    cfgfile = "Resources/cardDetection/train.cfg"
-    weightsfile = "Resources/cardDetection/card_chip.weights"
-    num_classes = 18
 
-    confidence = 0.5
-    nms_thesh = 0.3
-    start = 0
-    CUDA = torch.cuda.is_available()
-    
 
-    
-    
-    bbox_attrs = 5 + num_classes
-    
-    model = Darknet(cfgfile)
-    model.load_weights(weightsfile)
-    
-    model.net_info["height"] = 640
-    inp_dim = int(model.net_info["height"])
-    
-    assert inp_dim % 32 == 0 
-    assert inp_dim > 32
 
-    if CUDA:
-        model.cuda()
+# def RunIR():
+    
+    
+#     cfgfile = "Resources/cardDetection/train.cfg"
+#     weightsfile = "Resources/cardDetection/card_chip.weights"
+#     num_classes = 18
+
+#     confidence = 0.5
+#     nms_thesh = 0.3
+#     start = 0
+#     CUDA = torch.cuda.is_available()
+    
+#     bbox_attrs = 5 + num_classes
+    
+#     model = Darknet(cfgfile)
+#     model.load_weights(weightsfile)
+    
+#     model.net_info["height"] = 640
+#     inp_dim = int(model.net_info["height"])
+    
+#     assert inp_dim % 32 == 0 
+#     assert inp_dim > 32
+
+#     if CUDA:
+#         model.cuda()
             
-    model.eval()
+#     model.eval()
     
-    cap = cv2.VideoCapture(0)
+#     cap = cv2.VideoCapture(0)
     
-    assert cap.isOpened(), 'Cannot capture source'
+#     assert cap.isOpened(), 'Cannot capture source'
     
-    frames = 0
-    start = time.time()  
-    loadingBar.destroy()  
-    while stopIR == 0:
+#     frames = 0
+#     start = time.time()  
+#     loadingBar.destroy()  
+#     while stopIR == 0:
         
-        ret, frame = cap.read()
+#         ret, frame = cap.read()
     
         
-        img, orig_im, dim = prep_image(frame, inp_dim)
+#         img, orig_im, dim = prep_image(frame, inp_dim)
         
-        im_dim = torch.FloatTensor(dim).repeat(1,2)                        
+#         im_dim = torch.FloatTensor(dim).repeat(1,2)                        
         
         
-        if CUDA:
-            im_dim = im_dim.cuda()
-            img = img.cuda()
+#         if CUDA:
+#             im_dim = im_dim.cuda()
+#             img = img.cuda()
       
-        output = model(Variable(img), CUDA)
-        output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
+#         output = model(Variable(img), CUDA)
+#         output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
 
-        output[:,1:5] = torch.clamp(output[:,1:5], 0.0, float(inp_dim))/inp_dim
-        output[:,[1,3]] *= frame.shape[1]
-        output[:,[2,4]] *= frame.shape[0]
+#         output[:,1:5] = torch.clamp(output[:,1:5], 0.0, float(inp_dim))/inp_dim
+#         output[:,[1,3]] *= frame.shape[1]
+#         output[:,[2,4]] *= frame.shape[0]
 
         
-        classes = load_classes('Resources/cardDetection/classes.names')
-        colors = np.random.randint(0, 255, size=(len(classes), 3), dtype='uint8')
+#         classes = load_classes('Resources/cardDetection/classes.names')
+#         colors = np.random.randint(0, 255, size=(len(classes), 3), dtype='uint8')
         
-        list(map(lambda x: write(x, orig_im, classes, colors), output))
+#         list(map(lambda x: write(x, orig_im, classes, colors), output))
 
-        im = cv2.cvtColor(orig_im, cv2.COLOR_BGR2RGBA)
-        im = Image.fromarray(im)
-        im = ImageTk.PhotoImage(image=im)
-        lmain.configure(image=im)
-        lmain.update_idletasks()
 
-    cap.release()
-    cv2.destroyAllWindows()
-    lmain.configure(image=placeholdPhoto)        
+#     cap.release()
+#     cv2.destroyAllWindows()
+#     lmain.configure(image=placeholdPhoto)        
 
 
 
@@ -519,6 +508,27 @@ def startStream():
     T1 = threading.Thread(target=RunIR)
     T1.start()
     
+def RunIR():
+    detector = IR()
+    while stopIR == 0:
+        ret = detector(1)
+        if not ret:
+            continue
+        hands, img = ret
+        im = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+        im = Image.fromarray(im)
+        im = ImageTk.PhotoImage(image=im)
+        lmain.configure(image=im)
+        lmain.update_idletasks()
+
+
+                # if hands:
+		#     print(hands)
+
+		# cv2.imshow("frame", img)
+
+
+
 
 
 def endStream():
@@ -541,8 +551,14 @@ st.configure(font=(default_font, 12),width=75, height = 28, bg='black', fg='whit
 st.place(x=800,y=40)
 st.update_idletasks()
 
-playerBox = ttk.Spinbox(tab3, from_=1,to = 3, width=8, wrap='true', justify=CENTER, takefocus='false', exportselection = 'true')
-playerBox.place(x=975, y=600)
+playerIR = tk.IntVar()
+ttk.Label(tab3, text="Number of players", font=(default_font, 15)).place(x=950, y = 600)
+# Radio buttons return one more then label say to compensate for dealer 
+ttk.Radiobutton(tab3, text="1", variable=playerIR, value=2,).place(x=950, y=620)
+ttk.Radiobutton(tab3, text="2", variable=playerIR, value=3,).place(x=990, y=620)
+ttk.Radiobutton(tab3, text="3", variable=playerIR, value=4,).place(x=1030, y=620)
+
+
 
 
 startStream = ttk.Button(tab3, text="Start Livefeed", padding=18, width = 17, command=startStream)
@@ -563,10 +579,7 @@ runningCountLabelBox.place(x=200, y=660)
 ##############################
 
 #####TODO CHANGE TO SIMULATOR SPECIFIC INFO PAGE
-def openWebsiteSim():
-    webbrowser.open(
-        "https://sd1-blackjack.herokuapp.com/login?next=%2F", new=0, autoraise=True
-    )
+
 
 
 # MathPlotLibData
@@ -652,7 +665,7 @@ label = ttk.Label(tab4, text="Rule Variations:", font=("Helvetica", 18, "bold"))
 label.place(x=20, y=10)
 
 # Question Mark button leads to help website
-helpButton = ttk.Button(tab4, image=helpPhoto, command=openWebsiteSim).place(
+helpButton = ttk.Button(tab4, image=helpPhoto, command=openWebsite).place(
     x=1480, y=10
 )
 

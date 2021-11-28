@@ -1,7 +1,20 @@
 import math
-
+# To test against edge calc html, make sure 
+# Match all fo the static variables 
 
 def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces, basicStratDeviations,decks ):
+    
+    
+    # Static variables 
+    shuffle = 0 #Shuffle After Each Hand 
+    cd = 0      #Use CD Exceptions
+    sevens = 0  #777 Pays 3:1
+    hitAces = 0 # Hit Split Aces
+    split4 = 0 # Cannot split 4s 5s & 10s
+    noSplitAces = 1 # Cannot split Aces
+    
+    
+    
     #Variables 
     # decks = decks 
     # Number of decks
@@ -23,7 +36,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
     # [0] No Resplits
     # [1] Respltis to 3 hands
     # [2] Resplit to 4 hands
-    # [3] Respit aces 
+    # [3] RespLit aces 
 
     bj = [1,0,0,0,0,0]
     #   Blackjack Pays 3:2 
@@ -32,10 +45,6 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
     #   Blackjack Pays 7:5
     #   Blackjack Pays 2:1
     #   Suited BJ Pays 2:1
-
-    hitAces = 0 # Hit Split Aces
-    split4 = 0 # Cannot split 4s 5s & 10s
-    noSplitAces = 1 # Cannot split Aces
 
     if dealerStand == 1:
         h17 = [1,0]
@@ -65,9 +74,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
     # [4] 6-Card Charlie
     # [5] 7-Card Charlie
 
-    shuffle = 0 #Shuffle After Each Hand 
-    cd = 0      #Use CD Exceptions
-    sevens = 0  #777 Pays 3:1
+ 
 
     dv = {}
     #                  1       2      4       5       6       8      12        Decks
@@ -122,12 +129,12 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
     dv["split4h"] = [-0.008, -0.007, -0.006, -0.006, -0.005, -0.005, -0.005]	# Split 4, H17
     dv["split4s"] = [-0.006, -0.005, -0.004, -0.003, -0.003, -0.003, -0.003]	# Split 4, S17
     dv["splitA"] = [-0.139, -0.166, -0.177, -0.179, -0.181, -0.183, -0.185]	# Cannot Split Aces
-
+    #print("RERUN")
     sum = dv["ddecks"][decks]
-    
+    #print(sum)
     if (h17[1] == 1):
         sum += dv["h17"][decks]
-
+    #print(sum)
     if (peek[1] == 1):
         sum += dv["nopeek"][decks]
     elif (peek[2] == 1):
@@ -136,7 +143,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
         sum += dv["tpeek"][decks]
     elif (peek[4] == 1):
         sum += dv["ppeek"][decks]
-
+    #print(sum)
     if (double[1] == 1):
         if (double[4] == 1):
             sum += dv["d911"][decks]
@@ -144,7 +151,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
             sum += dv["d911nodas"][decks]
         if (h17[1]):
             sum += dv["d911h17"][decks]
-
+    
     elif (double[2] == 1):
         if (double[4] == 1):
             sum += dv["d1011"][decks]
@@ -155,18 +162,23 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
 
     elif ((double[3] == 1) and (h17[1] == 1)):
         sum += dv["ds911h17"][decks]
-
+    #print(sum)
     if ((resplits[1] == 1) and (double[4] == 1)):
         sum += dv["resplit3"][decks]
+        #print(str(sum)+ '    ****1')
     elif ((resplits[2] == 1) and (double[4] == 1)):
         sum += dv["resplit4"][decks]
+        #print(str(sum)+ '    ****2')
     elif ((resplits[0] == 1) and (double[4] == 0)):
         sum += dv["nodas"][decks]
+        #print(str(sum)+ '    ****3')
     elif ((resplits[1] == 1) and (double[4] == 0)):
         sum += dv["nodas3"][decks]
+        #print(str(sum)+ '    ****4')
     elif ((resplits[2] == 1) and (double[4] == 0)):
         sum += dv["nodas4"][decks]
-
+        #print(str(sum)+ '    ****5')
+    #print(sum)
     if ((hitAces == 1) and (noSplitAces == 0)):
         if (double[4] == 1):
             sum += dv["hitaces"][decks]
@@ -179,7 +191,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
             sum += dv["hitacesnp"][decks]
         if (h17[1] == 1):
             sum += dv["hitacesh17"][decks]
-
+    #print(sum)
     if ((resplits[1] == 1) and (resplits[3] == 1)):
         sum += dv["resplita3"][decks]
         if ((hitAces == 1) and noSplitAces == 0):
@@ -193,7 +205,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
             sum += dv["hitaces4"][decks]
         if ((peek[1] == 1) or (peek[2] == 1)):
             sum += dv["resplitanp4"][decks]
-
+    #print(sum)
     if ((h17[0] == 1) and (surrender[1] == 1)):
         sum += dv["lates17"][decks]
     elif ((h17[1] == 1) and (surrender[1] == 1)):
@@ -204,7 +216,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
         sum += dv["earlyh17"][decks]
     elif (surrender[2] == 1):
         sum += dv["earlys10"][decks]
-
+    #print(sum)
     if (charlie[1] == 1):
         sum += dv["card5"][decks]
     elif (charlie[2] == 1):
@@ -215,7 +227,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
         sum += dv["charlie6"][decks]
     elif (charlie[5] == 1):
         sum += dv["charlie7"][decks]
-
+    #print(sum)
     if (bj[1] == 1):
         sum += dv["bj11"][decks]
     elif (bj[2] == 1):
@@ -224,7 +236,7 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
         sum += dv["bj75"][decks]
     elif (bj[4] == 1):
         sum += dv["bj21"][decks]
-
+    #print(sum)
     if (bj[5] == 1):
         if (bj[0] == 1):
             sum += dv["sbj21"][decks]
@@ -234,28 +246,29 @@ def edgeCalc(insurance ,lateSurrender,doubleAfterSplit, dealerStand,resplitAces,
             sum += (dv["sbj21"][decks] * 1.6)
         elif (bj[3] == 1):
             sum += (dv["sbj21"][decks] * 1.2)
-
+    #print(sum)
     if ((h17[0] == 1) and (cd == 1)):
         sum += dv["cds17"][decks]
     elif ((h17[1] == 1) and (cd == 1)):
         sum += dv["cdh17"][decks]
-
+    #print(sum)
     if (shuffle == 0):
         sum += dv["shuffle"][decks]
-
+    #print(sum)
     if ((h17[0] == 1) and (split4 == 1) and (double[4] == 1)):
         sum += dv["split4s"][decks]
     elif ((h17[1] == 1) and (split4 == 1) and (double[4] == 1)):
         sum += dv["split4h"][decks]
-
+    #print(sum)
     if (noSplitAces == 1):
         sum += dv["splitA"][decks]
-
+    #print(sum)
     if (sevens == 1):
         sum += dv["sevens"][decks]
 
 
     houseEdge = round(-sum, 3)
+    #print("HOUSE EDGE" + str(houseEdge))
 
     dv2 = {}
     # 1         2       4       5       6       8      12 Dekcs
