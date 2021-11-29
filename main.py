@@ -450,6 +450,7 @@ def RunIR():
             for card in hand:
                 this_hand.append(Card(card, 's'))
             player_hands.append(Hand(this_hand))
+        player.hands = player_hands # update player object's hand
 
 
 
