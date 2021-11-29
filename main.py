@@ -444,7 +444,7 @@ def RunIR():
         for hand in hands:
             if len(hand) == 1: # dealer hand, only 1 card
                 dealer_upcard = hand[0]
-                table.dealer.hand = hand
+                table.dealer.hand = Hand([Card(dealer_upcard, 's')])
                 continue
             # otherwise player hand
             this_hand = []
