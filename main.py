@@ -444,13 +444,16 @@ def RunIR():
         for hand in hands:
             if len(hand) == 1: # dealer hand, only 1 card
                 dealer_upcard = hand[0]
+                table.dealer.hand = hand
                 continue
             # otherwise player hand
             this_hand = []
             for card in hand:
                 this_hand.append(Card(card, 's'))
             player_hands.append(Hand(this_hand))
+
         player.hands = player_hands # update player object's hand
+
 
 
 
@@ -461,8 +464,6 @@ def RunIR():
             if player == None:
                 continue
             if len(player_hands) > 1 and dealer_upcard != '':
-                print(hands)
-                print(player)
                 action = table.get_player_action(player, i)
                 all_actions.append(action)
     
