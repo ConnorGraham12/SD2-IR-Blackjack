@@ -441,7 +441,7 @@ def RunIR():
         
         player_hands = []
         if framecount % 20 == 0:
-            hands
+            pass
         for hand in hands:
             if len(hand) == 1: # dealer hand, only 1 card
                 dealer_upcard = hand[0]
