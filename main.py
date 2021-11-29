@@ -486,7 +486,7 @@ def RunIR():
                 if action == 'SPLIT':
                     if not already_split:
                         num_total_hands_required +=1
-                        already_split = true
+                        already_split = True
     
             print(all_actions)
             msg = ('All actions: ' + str(all_actions) + "\n")
