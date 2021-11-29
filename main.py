@@ -440,8 +440,6 @@ def RunIR():
         lmain.update_idletasks()
         
 
-        all_actions = []
-
         valid_up = False
         valid_hands = False
         num_hands = 0
@@ -458,6 +456,7 @@ def RunIR():
         if valid_up and valid_hands and num_hands >= 2:
 
             player_hands = []
+            all_actions = []
 
             if framecount % 20 == 0:
                 pass
@@ -487,9 +486,9 @@ def RunIR():
                     all_actions.append(action)
     
             msg = ('All actions: ' + str(all_actions) + "\n")
-        st.insert('end', msg)
-        st.update_idletasks()
-        st.yview(tk.END)
+            st.insert('end', msg)
+            st.update_idletasks()
+            st.yview(tk.END)
     cv2.destroyAllWindows()
     lmain.configure(image=placeholdPhoto) 
 
