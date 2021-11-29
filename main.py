@@ -448,7 +448,7 @@ def RunIR():
                 valid_up = True
                 num_hands += 1
 
-            if len(hand) >= 2 and hand[0] != '' and hand[1] != '':
+            if len(hand) >= 3 and hand[0] != '' and hand[1] != '':
                 valid_hands = True
                 num_hands += 1
 
@@ -501,6 +501,7 @@ def endStream():
     stopIR = 1
     try:
         loadingBar.stop()
+        cv2.destroyAllWindows()
     except:
         print("")
     lmain.update_idletasks()
