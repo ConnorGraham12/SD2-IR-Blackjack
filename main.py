@@ -485,10 +485,12 @@ def RunIR():
                     action = table.get_player_action(player, i)
                     all_actions.append(action)
     
+            print(all_actions)
             msg = ('All actions: ' + str(all_actions) + "\n")
             st.insert('end', msg)
-            st.update_idletasks()
             st.yview(tk.END)
+            st.update_idletasks()
+
     cv2.destroyAllWindows()
     lmain.configure(image=placeholdPhoto) 
 
