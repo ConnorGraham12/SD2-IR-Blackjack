@@ -465,6 +465,12 @@ class TableIR:
         hand = player.get_hand(hand_index)
         hand_type, hand_value = hand.get_hand_value()
 
+        if hand_value == 'A':
+            return 'SPLIT'
+        
+        if int(hand_value) >= 21:
+            return 'STAND'
+
         optimal_actions = self.strategy[hand_type][(hand_value, self.dealer.get_up_card().card_face)]
         # optimal_actions.insert(0, self.deviations())
         best_actions = self.validate_actions(optimal_actions, player, hand_index)
