@@ -443,6 +443,7 @@ def RunIR():
         if framecount % 20 == 0:
             pass
         for hand in hands:
+            print(hand)
             if len(hand) == 1: # dealer hand, only 1 card
                 dealer_upcard = hand[0]
                 table.dealer.hand = Hand([Card(dealer_upcard, 's')])
