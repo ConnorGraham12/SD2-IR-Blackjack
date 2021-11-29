@@ -486,7 +486,7 @@ def RunIR():
     
             # print(all_actions)
             hand_value_tuples = []
-            for hand in players.hands:
+            for hand in player.hands:
                 hand_value_tuples.append(hand.get_hand_value())
 
             msg = ''
