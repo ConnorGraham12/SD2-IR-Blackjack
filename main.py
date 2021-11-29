@@ -445,6 +445,7 @@ def RunIR():
         valid_up = False
         valid_hands = False
         num_hands = 0
+        print(hands)
         for hand in hands:
             if len(hand) == 1 and hand[0] != '': # valid dealer card
                 valid_up = True
