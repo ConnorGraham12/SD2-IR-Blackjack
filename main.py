@@ -439,39 +439,57 @@ def RunIR():
         lmain.configure(image=im)
         lmain.update_idletasks()
         
-        player_hands = []
-        if framecount % 20 == 0:
-            pass
-    
-        print(hands)
-        for hand in hands:
-            # print(hand)
-            if len(hand) == 1: # dealer hand, only 1 card
-                dealer_upcard = hand[0]
-                table.dealer.hand = Hand([Card(dealer_upcard, 's')])
-                continue
-            # otherwise player hand
-            this_hand = []
-            for card in hand:
-                this_hand.append(Card(card, 's'))
-            player_hands.append(Hand(this_hand))
 
-        player.hands = player_hands # update player object's hand
-
-
-
-
-        dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
-        st.insert('end', dealermsg)
         all_actions = []
-        for i in range(len(player_hands)):
-            if player == None or len(player.hands) < 1 or player_hands == []:
-                continue
-            if len(player_hands) > 1 and dealer_upcard != '':
-                action = table.get_player_action(player, i)
-                all_actions.append(action)
+
+        valid_up = False
+        valid_hands = False
+        num_hands = 0
+        for hand in hands:
+            if len(hand) == 1 and hand[0] != '': # valid dealer card
+                valid_up = True
+                num_hands += 1
+
+            if len(hand) >= 2 and hand[0] != '' and hand[1] != '':
+                valid_hands = True
+                num_hands += 1
+
+
+        if valid_up and valid_hands and num_hands >= 2:
+
+            player_hands = []
+
+            if framecount % 20 == 0:
+                pass
+        
+            print(hands)
+            for hand in hands:
+                # print(hand)
+                if len(hand) == 1: # dealer hand, only 1 card
+                    dealer_upcard = hand[0]
+                    table.dealer.hand = Hand([Card(dealer_upcard, 's')])
+                    continue
+                # otherwise player hand
+                this_hand = []
+                for card in hand:
+                    this_hand.append(Card(card, 's'))
+                player_hands.append(Hand(this_hand))
+
+            player.hands = player_hands # update player object's hand
+
+
+
+
+            dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
+            st.insert('end', dealermsg)
+            for i in range(len(player_hands)):
+                if player == None or len(player.hands) < 1 or player_hands == []:
+                    continue
+                if len(player_hands) > 1 and dealer_upcard != '':
+                    action = table.get_player_action(player, i)
+                    all_actions.append(action)
     
-        msg = (str(all_actions) + "\n")
+        msg = ('All actions: ' + str(all_actions) + "\n")
         st.insert('end', msg)
         st.update_idletasks()
         st.yview(tk.END)
