@@ -479,11 +479,19 @@ def RunIR():
             dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
             st.insert('end', dealermsg)
             for i in range(len(player_hands)):
+
                 action = table.get_player_action(player, i)
+                # print(action)
                 all_actions.append(action)
     
-            print(all_actions)
-            msg = ('All actions: ' + str(all_actions) + "\n")
+            # print(all_actions)
+            hand_value_tuples = []
+            for hand in players.hands:
+                hand_value_tuples.append(hand.get_hand_value())
+
+            msg = ''
+            for i in len(player.hands):
+                msg += f'{hand_value_tuples[i][0]} should {hand_value_tuples[i][1]}\n'
             st.insert('end', msg)
             st.yview(tk.END)
             st.update_idletasks()
@@ -501,7 +509,6 @@ def endStream():
     stopIR = 1
     try:
         loadingBar.stop()
-        cv2.destroyAllWindows()
     except:
         print("")
     lmain.update_idletasks()
