@@ -428,8 +428,9 @@ def RunIR():
     dealer_upcard = ''
     player_hands = []
 
+    num_total_hands_required = 2
     while stopIR == 0:
-        ret = detector(playerIR.get())
+        ret = detector(num_total_hands_required)
         if not ret:
             continue
         hands, img = ret
@@ -448,7 +449,7 @@ def RunIR():
                 valid_up = True
                 num_hands += 1
 
-            if len(hand) >= 3 and hand[0] != '' and hand[1] != '':
+            if len(hand) >= 2 and hand[0] != '' and hand[1] != '':
                 valid_hands = True
                 num_hands += 1
 
@@ -481,6 +482,8 @@ def RunIR():
             for i in range(len(player_hands)):
                 action = table.get_player_action(player, i)
                 all_actions.append(action)
+                if action == 'SPLIT':
+                    num_total_hands_required +=1
     
             print(all_actions)
             msg = ('All actions: ' + str(all_actions) + "\n")
