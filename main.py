@@ -439,6 +439,7 @@ def RunIR():
         lmain.configure(image=im)
         lmain.update_idletasks()
         
+        player_hands = []
         if framecount % 20 == 0:
             hands
         for hand in hands:
@@ -461,7 +462,7 @@ def RunIR():
         st.insert('end', dealermsg)
         all_actions = []
         for i in range(len(player_hands)):
-            if player == None:
+            if player == None or len(player.hands) < 1:
                 continue
             if len(player_hands) > 1 and dealer_upcard != '':
                 action = table.get_player_action(player, i)
