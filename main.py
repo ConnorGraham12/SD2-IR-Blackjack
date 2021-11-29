@@ -484,14 +484,12 @@ def RunIR():
                 # print(action)
                 all_actions.append(action)
     
-            # print(all_actions)
-            hand_value_tuples = []
-            for hand in player.hands:
-                hand_value_tuples.append(hand.get_hand_value())
+            # # print(all_actions)
+            # hand_value_tuples = []
+            # for hand in players.hands:
+            #     hand_value_tuples.append(hand.get_hand_value()) = hand.get_hand_value
 
-            msg = ''
-            for i in len(player.hands):
-                msg += f'{hand_value_tuples[i][0]} should {hand_value_tuples[i][1]}\n'
+            msg = ('All actions: ' + str(all_actions) + "\n")
             st.insert('end', msg)
             st.yview(tk.END)
             st.update_idletasks()
