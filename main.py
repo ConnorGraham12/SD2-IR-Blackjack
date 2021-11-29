@@ -418,7 +418,7 @@ def RunIR():
     currentHand = []
     previousHand = []
 
-    rules = RuleSet(8, 0.75, 10, 1000, lateSurrender=True)
+    rules = RuleSet(8, 0.75, 10, 1000, late_surrender=True)
     table = TableIR(0, rules)
     player = PlayerIR(0, 5000000)
     table.add_player(0, player) 
