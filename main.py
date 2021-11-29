@@ -479,11 +479,13 @@ def RunIR():
             dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
             st.insert('end', dealermsg)
             for i in range(len(player_hands)):
-                if player == None or len(player.hands) < 1 or player_hands == []:
-                    continue
-                if len(player_hands) > 1 and dealer_upcard != '':
-                    action = table.get_player_action(player, i)
-                    all_actions.append(action)
+                # if player == None or len(player.hands) < 1:
+                #     continue
+                # if len(player_hands) > 1 and dealer_upcard != '':
+                print(i)
+                action = table.get_player_action(player, i)
+                print(action)
+                all_actions.append(action)
     
             print(all_actions)
             msg = ('All actions: ' + str(all_actions) + "\n")
