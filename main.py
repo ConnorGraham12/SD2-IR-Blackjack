@@ -462,7 +462,6 @@ def RunIR():
             if framecount % 20 == 0:
                 pass
         
-            print(hands)
             for hand in hands:
                 # print(hand)
                 if len(hand) == 1: # dealer hand, only 1 card
@@ -478,8 +477,6 @@ def RunIR():
             player.hands = player_hands # update player object's hand
 
 
-
-
             dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
             st.insert('end', dealermsg)
             for i in range(len(player_hands)):
@@ -489,7 +486,7 @@ def RunIR():
                     action = table.get_player_action(player, i)
                     all_actions.append(action)
     
-        msg = ('All actions: ' + str(all_actions) + "\n")
+            msg = ('All actions: ' + str(all_actions) + "\n")
         st.insert('end', msg)
         st.update_idletasks()
         st.yview(tk.END)
