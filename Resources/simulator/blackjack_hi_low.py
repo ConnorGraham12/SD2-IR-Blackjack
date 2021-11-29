@@ -8,6 +8,10 @@ import matplotlib
 import numpy
 import Resources.simulator.basic_strategy as bs
 import Resources.simulator.count_map as cm
+from pandas import DataFrame as df
+
+class GameLogicError(Exception):
+    pass
 
 MIN_NUM_BETTING_UNITS_ALLOWED = 4
 MAX_NUM_OF_SPLITS_ALLOWED = 4
@@ -131,7 +135,8 @@ class Table:
                     for possibly_bankrupt_player in self.player_list:
                         if possibly_bankrupt_player == player:
                             self.bankrupt_players.append(player)
-                            self.player_list[i] = None
+                            player.bankrupted = True
+                            # self.player_list[i] = None
                         i+=1
                     # raise BankruptPlayer(f'Player {player._id} has less than {MIN_NUM_BETTING_UNITS_ALLOWED} betting units left')
                 player.place_bet(self.true_count)
@@ -145,6 +150,23 @@ class Table:
         # Example
         # 500,000 rounds % 500 => plot bankroll every 500 rounds
         # which totals 1000 points to plot
+
+
+        # player_ids = ['round']
+        # for player in game.player_list:
+        #     if player:
+        #         player_ids.append(player._id)
+
+        # bank_over_time_df = df(columns=player_ids)
+
+        # for i in range(500):
+        #     bank_over_time_df = bank_over_time_df.append({'round':i, 0:20+i, 1:30+2*i, 2:40+0.5*i}, ignore_index=True)
+
+
+
+        ## hot fix for setting zeros of bankrupt players. TOTALLY GROSS
+
+
         bank_over_time = numpy.zeros(num_bank_bins, dtype=int)
         bin_size = n/num_bank_bins
         j=0
@@ -153,7 +175,12 @@ class Table:
                 bank_over_time[j] = self.player_list[0].stack_size
                 j+=1
                 # print("at j=" +str(j) +"  stack="+str(self.player_list[0].stack_size))
+
+            if self.player_list[0].stack_size <= 100:
+                self.player_list[0].stack_size = 0
+                continue
             self.play_round()
+
 
         return bank_over_time
 
@@ -163,7 +190,11 @@ class Table:
     # honestly, need to rewrite this whole thing from stratch
     def play_round(self):
         if self.has_no_players():
-            raise NoPlayersError("No players have sat at the table")
+            for player in self.player_list:
+                if player:
+                    player.stack_size = 0
+            return
+            # raise NoPlayersError("No players have sat at the table")
 
         self.set_all_player_bets()
         self.deal_inital_round()
@@ -401,4 +432,4 @@ class Table:
         if action == 'STAND':
             return
 
-        # raise GameLogicError('This error should never be reached. If it is, then oopsies...')
+        raise GameLogicError('This error should never be reached. If it is, then oopsies...')

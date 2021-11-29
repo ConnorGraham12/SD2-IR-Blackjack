@@ -44,7 +44,7 @@ from PIL import ImageTk, Image
 from numpy.random.mtrand import random
 
 # For mathlib charts
-from pandas import DataFrame
+from pandas import DataFrame as df
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -556,66 +556,103 @@ runningCountLabelBox.place(x=200, y=660)
 
 #####TODO CHANGE TO SIMULATOR SPECIFIC INFO PAGE
 
+graphFrame = tk.Frame(tab4, width='1000', height='500')
 
+placeholderImageGraph = Image.open("Resources/images/graphPlaceholder.png")
+placeholdPhotoGraph = ImageTk.PhotoImage(placeholderImageGraph.resize((1000, 562), Image.ANTIALIAS))
 
-# MathPlotLibData
+graphFrame.place(x=520, y = 60)
+
+palceholdLabel = ttk.Label(graphFrame, borderwidth=2 , relief="solid")
+palceholdLabel.grid(row=0, column=0, columnspan=15)
+palceholdLabel.configure(image=placeholdPhotoGraph)
+palceholdLabel.config(borderwidth=3, relief=tk.SOLID)
+
+tk.Label(tab4, text = 'Settings:', font=(default_font, 30)).place(x= 10, y = 20)
 
 bankrollvsTime = []
-def demoDay():
-    
-    #TODO DELETE DEMO ONLY TEST 
+
+def runSim():
     global progress
-    
     num_decks = 8
+    
+    num_players = current_valueNP.get()
+    print(num_players)
     deck_pen = 0.75
     min_bet = 10
     max_bet = 1000
-
-    total_rounds_played = 15000
-    start_stack_size = 50000
-    betting_units = 200
+    # Must be mod 500 or wont work 
+    total_rounds_played = current_valueRP.get() - (current_valueRP.get() % 500)
+    print(total_rounds_played)
+    start_stack_size = float(bankroll())
+    print(start_stack_size, current_valueBR.get())
+    betting_units = current_valueBU.get()
+    print(betting_units)
     num_bins = 500
 
-    game = Table(num_decks, deck_pen, min_bet, max_bet)
-    player_list = []
-
-    player_list.append(Player(0, start_stack_size, betting_units, '1-12'))
-    player_list[0].take_seat(0, game)
-
-
-    bankroll_over_time = game.play_n_rounds(total_rounds_played, num_bins)
-        
-    rounds = np.linspace(0, total_rounds_played, retstep=True, num=num_bins, dtype=int, axis=0)
     
-    global bankrollvsTime
 
-    bankrollvsTime = DataFrame(data = np.column_stack((rounds[0],bankroll_over_time)), columns=['Rounds', 'Bankroll']).groupby("Rounds").sum()
+    player_list = []
+    tables = []
+    for i in range(num_players):
+        tables.append(Table(num_decks, deck_pen, min_bet, max_bet))
+        player_list.append(Player(i, start_stack_size, betting_units, '1-12'))
+        player_list[i].take_seat(0, tables[i])
 
-    #####
- 
-    # progress.stop()
-    # MathPlotLib Graph
-    figure2 = plt.Figure(figsize=(9, 4), dpi=85)
+    player_ids = ['round']
+    for player in player_list:
+        player_ids.append(player._id)
 
-    ax2 = figure2.add_subplot(111)
+    bank_over_time_df = df(columns=player_ids)
 
-    line2 = FigureCanvasTkAgg(figure2, tab4)
+    my_array = np.array([tables[0].play_n_rounds(total_rounds_played, num_bins)])
 
-    line2.get_tk_widget().place(x=650, y=25)
+    for i in range(len(player_list)):
+        if i == 0:
+            continue
+        my_array = np.insert(my_array, i, tables[i].play_n_rounds(total_rounds_played, num_bins), axis=0)
 
-    # df2 = bankrollvsTime[["Rounds", "Bankroll"]].groupby("Time").sum()
 
-    bankrollvsTime.plot(kind="line", legend=True, ax=ax2, color="g", marker="o", fontsize=20)
+    for i in range(num_bins):
+        bank_over_time_df = bank_over_time_df.append({'round': i}, ignore_index=True)
 
-    figure2.set_facecolor('xkcd:grey')
+    for i in range(len(player_list)):
+        bank_over_time_df[i] = my_array[i]
 
-    ax2.set_facecolor('xkcd:white')
+    fig = plt.figure(figsize=(10, 6), dpi=101)
+    fig.add_subplot(111)
+    
 
-    ax2.set_title("Time Vs. Bankroll")
+    bank_over_time_df['round'] = bank_over_time_df['round']*(total_rounds_played/num_bins)
+    for i in range(len(player_list)):
+        plt.plot(bank_over_time_df['round'], bank_over_time_df[i])
 
+    num_bankrupts = 0
+    for table in tables:
+        if table.player_list[0].stack_size <= 0:
+            num_bankrupts +=1
+
+    max_y = 0
+    for i in range(len(player_list)):
+        tmp = bank_over_time_df[i].max()
+        if tmp > max_y:
+            max_y = tmp
+
+
+    fig.set_facecolor('xkcd:grey')
+    canvas = FigureCanvasTkAgg(fig, graphFrame)
+    canvas.draw()
+    plt.axis([0,total_rounds_played, 0 , (max_y*1.25)])
+    plt.text(0, max_y, f'Num players: {num_players}')
+    plt.text(0, max_y - max_y/16, f'Num bankrupt players: {num_bankrupts}')
+    plt.title('Change in Player Bankrolls Over Time')
+    plt.xlabel("Rounds Played")
+    plt.ylabel("Bankroll in Dollars")
     progress.stop()
+    canvas.get_tk_widget().place(x=0,y=0)
+    
 
-    # END DELETE
+
 
 # Rule Variatiions
 insurance = tk.IntVar()
@@ -625,124 +662,86 @@ dealerStand = tk.IntVar()
 resplitAces = tk.IntVar()
 basicStratDeviations = tk.IntVar()
 
-# Variation Label
-label = ttk.Label(tab4, text="Rule Variations:", font=("Helvetica", 18, "bold"))
-label.place(x=20, y=10)
 
-# Question Mark button leads to help website
-helpButton = ttk.Button(tab4, image=helpPhoto, command=openWebsite).place(
-    x=1480, y=10
-)
-
-# CheckButtons
-c1 = ttk.Checkbutton(
-    tab4, text="Insurance", variable=insurance, onvalue=1, offvalue=0
-).place(x=20, y=40)
-c2 = ttk.Checkbutton(
-    tab4, text="Late Surrender Allowed", variable=lateSurrender, onvalue=1, offvalue=0
-).place(x=20, y=80)
-c3 = ttk.Checkbutton(
-    tab4, text="Double After Split", variable=doubleAfterSplit, onvalue=1, offvalue=0
-).place(x=20, y=120)
-c4 = ttk.Checkbutton(
-    tab4, text="Dealer Stands on soft 17 ", variable=dealerStand, onvalue=1, offvalue=0
-).place(x=20, y=160)
-c5 = ttk.Checkbutton(
-    tab4, text="Resplit aces", variable=resplitAces, onvalue=1, offvalue=0
-).place(x=20, y=200)
-
-
-#Kelly Bets Radio
-ttk.Radiobutton(tab4, text="Kelly Bet", variable=decks, value=0).place(x=20, y=650)
-ttk.Radiobutton(tab4, text="Flat Bet", variable=decks, value=1).place(x=130, y=650)
-# value = 0
-# current_value = 0.1
-current_valueROR = tk.DoubleVar(value = .1)
+current_valueBU = tk.IntVar(value = 10)
 current_valueBR = tk.IntVar(value = 0)
 current_valueRP = tk.IntVar(value = 0)
-
-#Functions for Risk of Ruin slider
-
-def riskOfRuin():
-    # print(current_value.get())
-    tmp = -math.log(current_valueROR.get(), 2)
-    ror = math.exp(-2/tmp)
-    return str('{: .3f}'.format(ror))
-    
-def slider_changedRor(event):
-    s2Label = ttk.Label(tab4, text=riskOfRuin(), borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
-    s2Label.place(x=355, y=555)
-    s2Label.configure(text=riskOfRuin())
+current_valueNP = tk.IntVar(value = 1)
 
 # Functions for Bankroll slider
 
 def bankroll():
     val = current_valueBR.get()
-    tmp = math.pow(val, 4)
+    tmp = math.pow(val, 2)
     return str('{: .1f}'.format(tmp))
 
 def slider_changedBR(event):
     s1Label = ttk.Label(tab4, text=bankroll(), borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
-    s1Label.place(x=355, y=505)
+    s1Label.place(x=355, y=105)
     s1Label.configure(text=bankroll())
     s1Label.update_idletasks()
+
+# Betting Units Slider
+def slider_changedBU(event):
+    s2Label = ttk.Label(tab4, text=current_valueBU, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+    s2Label.place(x=355, y=185)
+    s2Label.configure(text=current_valueBU.get())
 
 # Function for rounds played slider
 
 def slider_changedRP(event):
     s3Label = ttk.Label(tab4, text=current_valueRP, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
-    s3Label.place(x=355, y=605)
+    s3Label.place(x=355, y=265)
     s3Label.configure(text=current_valueRP.get())
     s3Label.update_idletasks()
 
+def slider_changedNP(event):
+    s4Label = ttk.Label(tab4, text=current_valueNP, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+    s4Label.place(x=355, y=345)
+    s4Label.configure(text=current_valueNP.get())
+    s4Label.update_idletasks()    
+
 # Sliders
-s1 = ttk.Scale(tab4, from_=0, to=47.2870805, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
+s1 = ttk.Scale(tab4, from_=100, to=1000, orient="horizontal",command=slider_changedBR, variable=current_valueBR)
 s1.set(0)
-s1.place(x=240, y=510)
+s1.place(x=240, y=110)
 
-s2 = ttk.Scale(tab4, from_=0.999, to=0.5, orient="horizontal", command=slider_changedRor, variable=current_valueROR)
+s2 = ttk.Scale(tab4, from_=10, to=1000, orient="horizontal", command=slider_changedBU, variable=current_valueBU)
 s2.set(0.999)
-s2.place(x=240, y=560)
+s2.place(x=240, y=190)
 
-s3 = ttk.Scale(tab4, from_=0, to=5000000, orient="horizontal", command = slider_changedRP, variable = current_valueRP)
+s3 = ttk.Scale(tab4, from_=500, to=100000, orient="horizontal", command = slider_changedRP, variable = current_valueRP)
 s3.set(0)
-s3.place(x=240, y=610)
+s3.place(x=240, y=270)
+
+s4 = ttk.Scale(tab4, from_=1, to=10, orient="horizontal", command = slider_changedNP, variable = current_valueNP)
+s4.set(0)
+s4.place(x=240, y=350)
+
 
 # Slider Labels
-s1Label = ttk.Label(tab4, text="Starting Bankroll:").place(x=10, y=500)
-s2Label = ttk.Label(tab4, text="Risk of Ruin:").place(x=10, y=550)
-s3Label = ttk.Label(tab4, text="Rounds Played:").place(x=10, y=600)
-
+s1Label = ttk.Label(tab4, text="Starting Bankroll:").place(x=10, y=100)
+s2Label = ttk.Label(tab4, text="Betting Units:").place(x=10, y=180)
+s3Label = ttk.Label(tab4, text="Rounds Played:").place(x=10, y=260)
+s4Label = ttk.Label(tab4, text="Number Players:").place(x=10, y=340)
 
 # Progress Bar
 progress = ttk.Progressbar(tab4, orient=HORIZONTAL, length=300, mode="indeterminate")
-progress.place(x=870, y=380)
+progress.place(x=70, y=520)
 
 # Step Function to iterate loading bar 
-
+fig = plt.figure()
 
 def runGraph():
     global progress
     progress.start(10)
-    T2 = threading.Thread(target=demoDay)
+    # runSim()
+    T2 = threading.Thread(target=runSim)
     T2.start()
 
 # Run Button
-runButton = ttk.Button(tab4, text="Run", padding=15, command=runGraph)
-runButton.place(x=950, y=420)
-
-# Add player button
-add_player_button = ttk.Button(tab4, text="Add Player", padding=5)
-add_player_button.place(x=810, y=520)
-
-#   Add table button
-add_table_button = ttk.Button(tab4, text="Add Table", padding=5)
-add_table_button.place(x=960, y=520)
-
-#   clear all button
-clear_all_button = ttk.Button(tab4, text="Clear", padding=5)
-clear_all_button.place(x=1110, y=520)
-
+runButton = ttk.Button(tab4, text="Run", padding=19, command=runGraph)
+runButton.place(x=150, y=560)
 
 
 root.mainloop()

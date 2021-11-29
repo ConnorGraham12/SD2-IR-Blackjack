@@ -26,7 +26,8 @@ class Player():
         self.times_split = 0
         self.doubled_this_round = False
         self.num_hands_played = 0
-
+        self.bankrupted = False
+        
         # defaults to a '1-8' bet spread
         if bet_spread_type == None or bet_spread_type == '1-8':
             self.bet_spread_type = '1-8'
