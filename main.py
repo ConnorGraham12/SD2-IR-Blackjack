@@ -418,7 +418,7 @@ def RunIR():
     currentHand = []
     previousHand = []
 
-    rules = RuleSet(8, 0.75, 10, 1000)
+    rules = RuleSet(8, 0.75, 10, 1000, lateSurrender=True)
     table = TableIR(0, rules)
     player = PlayerIR(0, 5000000)
     table.add_player(0, player) 
@@ -493,6 +493,7 @@ def RunIR():
             st.insert('end', msg)
             st.yview(tk.END)
             st.update_idletasks()
+        # lmain.update_idletasks()
 
     cv2.destroyAllWindows()
     lmain.configure(image=placeholdPhoto) 
