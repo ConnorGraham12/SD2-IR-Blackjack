@@ -429,6 +429,7 @@ def RunIR():
     player_hands = []
 
     num_total_hands_required = 2
+    already_split = False
     while stopIR == 0:
         ret = detector(num_total_hands_required)
         if not ret:
@@ -483,7 +484,9 @@ def RunIR():
                 action = table.get_player_action(player, i)
                 all_actions.append(action)
                 if action == 'SPLIT':
-                    num_total_hands_required +=1
+                    if not already_split:
+                        num_total_hands_required +=1
+                        already_split = true
     
             print(all_actions)
             msg = ('All actions: ' + str(all_actions) + "\n")
