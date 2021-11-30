@@ -500,7 +500,7 @@ def RunIR():
             if frame_count % 5 == 0:
                 st.insert('end', msg)
                 st.yview(tk.END)
-                st.update_idletasks()
+                # st.update_idletasks()
             
         # lmain.update_idletasks()
 
