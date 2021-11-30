@@ -497,7 +497,7 @@ def RunIR():
             msg += '\n\n'
             # msg = (f'{} ' + str(all_actions) + "\n")
             # msg = ('All actions: ' + str(all_actions) + "\n")
-            if frame_count % 5 == 0:
+            if frame_count % 40 == 0:
                 st.insert('end', msg)
                 st.yview(tk.END)
                 # st.update_idletasks()
