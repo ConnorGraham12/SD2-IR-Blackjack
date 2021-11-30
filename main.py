@@ -592,11 +592,11 @@ def runSim():
     max_bet = 1000
     # Must be mod 500 or wont work 
     total_rounds_played = current_valueRP.get() - (current_valueRP.get() % 500)
-    print(total_rounds_played)
+    # print(total_rounds_played)
     start_stack_size = float(bankroll())
-    print(start_stack_size, current_valueBR.get())
+    # print(start_stack_size, current_valueBR.get())
     betting_units = current_valueBU.get()
-    print(betting_units)
+    # print(betting_units)
     num_bins = 500
 
     
