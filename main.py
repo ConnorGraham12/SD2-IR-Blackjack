@@ -744,9 +744,9 @@ fig = plt.figure()
 def runGraph():
     global progress
     progress.start(10)
-    # runSim()
-    T2 = threading.Thread(target=runSim)
-    T2.start()
+    runSim()
+    # T2 = threading.Thread(target=runSim)
+    # T2.start()
 
 # Run Button
 runButton = ttk.Button(tab4, text="Run", padding=19, command=runGraph)
