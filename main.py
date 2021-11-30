@@ -549,12 +549,12 @@ startStream = ttk.Button(tab3, text="Start Livefeed", padding=18, width = 17, co
 startStream.place(x=1275, y=600)
 endStream = ttk.Button(tab3, text="End Livefeed", padding=18,  width = 17,command=endStream)
 
-trueCountLabel = ttk.Label(tab3, text="True Count:").place(x=10, y=600)
-runningCountLabel = ttk.Label(tab3, text="Running Count:").place(x=10, y=650)
-trueCountLabelBox = ttk.Label(tab3, text=0, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
-trueCountLabelBox.place(x=200, y=610)
-runningCountLabelBox = ttk.Label(tab3, text=0, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
-runningCountLabelBox.place(x=200, y=660)
+# trueCountLabel = ttk.Label(tab3, text="True Count:").place(x=10, y=600)
+# runningCountLabel = ttk.Label(tab3, text="Running Count:").place(x=10, y=650)
+# trueCountLabelBox = ttk.Label(tab3, text=0, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+# trueCountLabelBox.place(x=200, y=610)
+# runningCountLabelBox = ttk.Label(tab3, text=0, borderwidth=3, relief="solid", width = 8, anchor=CENTER, font=(default_font, 17))
+# runningCountLabelBox.place(x=200, y=660)
 
 ##############################
 # 						     #
