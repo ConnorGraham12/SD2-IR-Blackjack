@@ -211,12 +211,12 @@ def trueCountUp():
 ##CHART SIDE
 ##
 
-graphFrame = tk.Frame(tab2)
-t = Chart(graphFrame, 'hit')
+graphFrame2 = tk.Frame(tab2)
+t = Chart(graphFrame2, 'hit')
 
 
 
-graphFrame.place(x = 900, y = 20)
+graphFrame2.place(x = 900, y = 20)
 
 
 # Up Increment
@@ -251,7 +251,7 @@ stdDevLabel.place(x=240, y=650)
 
 
 def runEdgeCalc():
-    global trueCount, graphFrame
+    global trueCount, graphFrame2
     houseText, stdDevText = edgeCalc(
         insuranceTC.get(),
         lateSurrenderTC.get(),
@@ -269,15 +269,15 @@ def runEdgeCalc():
     stdDevLabel.configure(text = stdDevText)
     stdDevLabel.update_idletasks()
 
-    graphFrame.destroy()
+    graphFrame2.destroy()
     if dealerStandTC.get() == 1:
-        graphFrame = tk.Frame(tab2)
-        t = Chart(graphFrame, 'hit')
-        graphFrame.place(x = 900, y = 20)
+        graphFrame2 = tk.Frame(tab2)
+        t = Chart(graphFrame2, 'hit')
+        graphFrame2.place(x = 900, y = 20)
     else:
-        graphFrame = tk.Frame(tab2)
-        t = Chart(graphFrame, 'stand')
-        graphFrame.place(x = 900, y = 20)
+        graphFrame2 = tk.Frame(tab2)
+        t = Chart(graphFrame2, 'stand')
+        graphFrame2.place(x = 900, y = 20)
 
 
 # CheckBoxes
