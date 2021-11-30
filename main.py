@@ -170,7 +170,7 @@ trueCount = 0
 global trueCountLabel
 trueCountLabel = ttk.Label(tab2, text="True Count: 0")
 
-trueCountLabel.place(x=475, y=150)
+trueCountLabel.place(x=715, y=310)
 
 
 def trueCountDown():
@@ -181,7 +181,7 @@ def trueCountDown():
     else:
         if trueCount == 0:
             trueCountLabel = ttk.Label(tab2, text="True Count: 0")
-            trueCountLabel.place(x=475, y=150)
+            trueCountLabel.place(x=715, y=310)
         trueCount -= 1
         updateText = "True Count: " + str(trueCount)
         trueCountLabel.configure(text=updateText)
@@ -197,7 +197,7 @@ def trueCountUp():
     else:
         if trueCount == 0:
             trueCountLabel = ttk.Label(tab2, text="True Count: 0")
-            trueCountLabel.place(x=475, y=150)
+            trueCountLabel.place(x=715, y=310)
         trueCount += 1
         updateText = "True Count: " + str(trueCount)
         trueCountLabel.configure(text=updateText)
@@ -216,19 +216,19 @@ t = Chart(graphFrame, 'hit')
 
 
 
-graphFrame.place(x = 1050, y = 20)
+graphFrame.place(x = 900, y = 20)
 
 
 # Up Increment
 upButtonImg = Image.open("Resources/images/upArrow.png")
 upButtonImg2 = ImageTk.PhotoImage(upButtonImg.resize((70, 40), Image.ANTIALIAS))
-upButton = ttk.Button(tab2, image=upButtonImg2, command=trueCountUp).place(x=500, y=80)
+upButton = ttk.Button(tab2, image=upButtonImg2, command=trueCountUp).place(x=750, y=240)
 
 # Down Increment
 downButtonImg = Image.open("Resources/images/downArrow.png")
 downButtonImg2 = ImageTk.PhotoImage(downButtonImg.resize((70, 40), Image.ANTIALIAS))
 downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place(
-    x=500, y=200
+    x=750, y=380
 )
 
 
@@ -236,7 +236,7 @@ downButton = ttk.Button(tab2, image=downButtonImg2, command=trueCountDown).place
 ##
 ##EDGE CALC SIDE
 ##
-houseEdgeTag = ttk.Label(tab2, text="Player Edge:", font=(default_font, 17))
+houseEdgeTag = ttk.Label(tab2, text="House Edge:", font=(default_font, 17))
 houseEdgeTag.place(x=10, y=600)
 stdDevTag = ttk.Label(tab2, text="Standard Deviation:", font=(default_font, 17))
 stdDevTag.place(x=10, y=650)
@@ -262,7 +262,7 @@ def runEdgeCalc():
         decks.get(),
     )
     
-    playerEdge = str('{: .3f}'.format(1 - float(houseText) + (0.5) * trueCount) + "%")
+    playerEdge = str('{: .3f}'.format(float(houseText) + (-0.5) * trueCount) + "%")
 
     playerEdgeLabel.configure(text = playerEdge)
     playerEdgeLabel.update_idletasks()
@@ -273,11 +273,11 @@ def runEdgeCalc():
     if dealerStandTC.get() == 1:
         graphFrame = tk.Frame(tab2)
         t = Chart(graphFrame, 'hit')
-        graphFrame.place(x = 1050, y = 20)
+        graphFrame.place(x = 900, y = 20)
     else:
         graphFrame = tk.Frame(tab2)
         t = Chart(graphFrame, 'stand')
-        graphFrame.place(x = 1050, y = 20)
+        graphFrame.place(x = 900, y = 20)
 
 
 # CheckBoxes
@@ -305,7 +305,7 @@ tc1 = ttk.Checkbutton(
     onvalue=1,
     offvalue=0,
     command=runEdgeCalc,
-).place(x=20, y=80)
+).place(x=20, y=100)
 tc2 = ttk.Checkbutton(
     tab2,
     text="Late Surrender Allowed",
@@ -313,14 +313,14 @@ tc2 = ttk.Checkbutton(
     onvalue=1,
     offvalue=0,
     command=runEdgeCalc,
-).place(x=20, y=120)
+).place(x=20, y=170)
 tc3 = ttk.Checkbutton(
     tab2, text="Double After Split", 
     variable=doubleAfterSplitTC,
     onvalue=1,
     offvalue=0,
     command=runEdgeCalc,
-).place(x=20, y=160)
+).place(x=20, y=240)
 tc4 = ttk.Checkbutton(
     tab2,
     text="Dealer Stands on soft 17 ",
@@ -328,14 +328,14 @@ tc4 = ttk.Checkbutton(
     onvalue=1,
     offvalue=0,
     command=runEdgeCalc
-).place(x=20, y=200)
+).place(x=20, y=310)
 tc5 = ttk.Checkbutton(
     tab2, text="Resplit aces", 
     variable=resplitAcesTC, 
     onvalue=1,
     offvalue=0,
     command=runEdgeCalc
-).place(x=20, y=240)
+).place(x=20, y=380)
 tc6 = ttk.Checkbutton(
     tab2,
     text="Basic Startegy Deviations",
@@ -343,7 +343,7 @@ tc6 = ttk.Checkbutton(
     onvalue=1,
     offvalue=0,
     command=runEdgeCalc
-).place(x=20, y=280)
+).place(x=20, y=450)
 
 helpButton = ttk.Button(tab2, image=helpPhoto, command=openWebsite).place(
     x=1480, y=10

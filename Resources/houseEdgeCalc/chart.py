@@ -47,7 +47,7 @@ class Chart:
             for y in range(15):
                 for x in range(14):
                     
-                    temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
+                    temp = tk.Entry(root, width=5, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
 
                     if(y == 0):
 
@@ -95,7 +95,7 @@ class Chart:
             for y in range(9):
                 for x in range(14):
                     
-                    temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
+                    temp = tk.Entry(root, width=5, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow")
 
                     if(y == 0):
 
@@ -144,7 +144,7 @@ class Chart:
             for y in range(11):
                 for x in range(14):
                     
-                    temp = tk.Entry(root, width=3, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow", takefocus='false')
+                    temp = tk.Entry(root, width=5, fg='black',font=('arial',10,'bold'), justify='center',cursor="arrow", takefocus='false')
 
                     if(y == 0):
 
