@@ -436,11 +436,6 @@ def RunIR():
         if not ret:
             continue
         hands, img = ret
-        im = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-        im = Image.fromarray(im)
-        im = ImageTk.PhotoImage(image=im)
-        lmain.configure(image=im)
-        lmain.update_idletasks()
         
 
         valid_up = False
@@ -502,6 +497,12 @@ def RunIR():
                 st.yview(tk.END)
                 # st.update_idletasks()
             
+            im = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+            im = Image.fromarray(im)
+            im = ImageTk.PhotoImage(image=im)
+            lmain.configure(image=im)
+            lmain.update_idletasks()
+        
         # lmain.update_idletasks()
 
     cv2.destroyAllWindows()
