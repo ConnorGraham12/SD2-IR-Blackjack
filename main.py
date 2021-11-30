@@ -148,7 +148,7 @@ image1 = Image.open("Resources/images/blackjackLogo.png")
 photo1 = ImageTk.PhotoImage(image1.resize((490, 412), Image.ANTIALIAS))
 imgLabel1 = ttk.Label(tab1, image=photo1).place(x=540, y=80)
 
-ttk.Button(tab1, text = "Learn more about the app!",command = openWebsite, padding=15).place(x=660, y=630)
+ttk.Button(tab1, text = "Learn more about the app!",command = openWebsite, padding=15).place(x=650, y=630)
 
 # Lables
 ttk.Label(tab1, text="The ultimate card counting trainer.",font=(default_font, 26)).place(x=525, y=505)
@@ -643,8 +643,8 @@ def runSim():
     canvas = FigureCanvasTkAgg(fig, graphFrame)
     canvas.draw()
     plt.axis([0,total_rounds_played, 0 , (max_y*1.25)])
-    plt.text(0, max_y, f'Num players: {num_players}')
-    plt.text(0, max_y - max_y/16, f'Num bankrupt players: {num_bankrupts}')
+    plt.text(1, max_y*1.2, f'Num players: {num_players}')
+    plt.text(1, (max_y*1.2) - max_y/16, f'Num bankrupt players: {num_bankrupts}')
     plt.title('Change in Player Bankrolls Over Time')
     plt.xlabel("Rounds Played")
     plt.ylabel("Bankroll in Dollars")
