@@ -428,7 +428,10 @@ def RunIR():
     dealer_upcard = ''
     player_hands = []
 
+
+    frame_count = 0
     while stopIR == 0:
+        frame_count+=1
         ret = detector(playerIR.get())
         if not ret:
             continue
@@ -453,13 +456,10 @@ def RunIR():
                 num_hands += 1
 
 
-        if valid_up and valid_hands and num_hands >= 2:
+        if valid_up and valid_hands and num_hands >= playerIR.get():
 
             player_hands = []
             all_actions = []
-
-            if framecount % 20 == 0:
-                pass
         
             for hand in hands:
                 # print(hand)
@@ -476,8 +476,8 @@ def RunIR():
             player.hands = player_hands # update player object's hand
 
 
-            dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
-            st.insert('end', dealermsg)
+            # dealermsg = (f"dealer upcard is: {dealer_upcard} \n")
+            # st.insert('end', dealermsg)
             for i in range(len(player_hands)):
 
                 action = table.get_player_action(player, i)
@@ -485,12 +485,20 @@ def RunIR():
                 all_actions.append(action)
     
             # # print(all_actions)
-            # hand_value_tuples = []
-            # for hand in players.hands:
-            #     hand_value_tuples.append(hand.get_hand_value()) = hand.get_hand_value
+            hand_value_tuples = []
+            for hand in player_hands:
+                hand_value_tuples.append(hand.get_hand_value())
 
-            msg = ('All actions: ' + str(all_actions) + "\n")
-            st.insert('end', msg)
+            msg = (f"Upcard: {dealer_upcard} \n")
+            q = 0
+            for tuple in hand_value_tuples:
+                msg += f'   {tuple[0]} {tuple[1]} should {all_actions[q]} \n'
+                q +=1
+            msg += '\n\n'
+            # msg = (f'{} ' + str(all_actions) + "\n")
+            # msg = ('All actions: ' + str(all_actions) + "\n")
+            if frame_count % 9 == 0:
+                st.insert('end', msg)
             st.yview(tk.END)
             st.update_idletasks()
         # lmain.update_idletasks()
@@ -524,15 +532,15 @@ st.update_idletasks()
 
 playerIR = tk.IntVar(tab3, 2)
 # playerIR.set(tab3, 2)
-ttk.Label(tab3, text="Number of players", font=(default_font, 15)).place(x=950, y = 600)
+ttk.Label(tab3, text="Number of hands", font=(default_font, 15)).place(x=1000, y = 600)
 # Radio buttons return one more then label say to compensate for dealer 
 t1 = ttk.Radiobutton(tab3, text="1", variable=playerIR, value=2,)
 t2 = ttk.Radiobutton(tab3, text="2", variable=playerIR, value=3,)
 t3 = ttk.Radiobutton(tab3, text="3", variable=playerIR, value=4,)
 
-t1.place(x=950, y=620)
-t2.place(x=990, y=620)
-t3.place(x=1030, y=620)
+t1.place(x=1000, y=620)
+t2.place(x=1040, y=620)
+t3.place(x=1080, y=620)
 # t1.invoke()
 
 
