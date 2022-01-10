@@ -11,7 +11,7 @@ This Senior Design project includes:
 
 -Desktop app with image recognition to detect a dealt blackjack hand and dealers up card, as well as give the proper way the player should play their hand. 
 
--Bankroll simulator capable of mimicing multiple players over a desired number of hands  
+-Bankroll simulator capable of mimicking multiple players over a desired number of hands  
 
 -Live updating strategy charts to teach the player proper strategy.  
 
